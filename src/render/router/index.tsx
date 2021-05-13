@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
-import {CloudDownloadOutlined, HomeOutlined, SettingOutlined, UserOutlined} from '@ant-design/icons-vue'
+import { CloudDownloadOutlined, HomeOutlined, SettingOutlined } from '@ant-design/icons-vue'
 
 export interface RouteMeta {
   icon?: JSX.Element

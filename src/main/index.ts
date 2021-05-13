@@ -3,7 +3,7 @@
  */
 import { join } from 'path'
 import { app } from 'electron'
-import { Main } from './window'
+import { Main, registerDownloadService } from './window'
 import store from '@src/common/utils/store'
 import dotenv from 'dotenv'
 import {
@@ -15,9 +15,9 @@ dotenv.config({ path: join(__dirname, '../../.env') })
 function init() {
   // const loginWin = new Login()
   const mainWin = new Main()
-
   const mainOpen = () => {
     mainWin.open()
+    registerDownloadService(mainWin.win);
     const unsubscribeDevtool = mainWin.subscribe(TOGGLE_DEVTOOLS, win => {
       mainWin.win?.webContents.toggleDevTools()
     })
