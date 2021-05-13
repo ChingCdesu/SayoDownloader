@@ -1,17 +1,17 @@
 <template>
   <div class="song-card">
-    <!-- TODO: 更换cover图片-->
+    <!-- TODO: 更换cover图片 -->
     <div class="covers">
       <div class="left-cover">
-        <img class="img-cover" src="https://assets.ppy.sh/beatmaps/648659/covers/list@2x.jpg">
+        <img class="img-cover" :src="`https://assets.ppy.sh/beatmaps/${this.beatmap_set.id}/covers/list@2x.jpg`">
       </div>
       <div class="right-cover">
-        <img class="img-cover" src="https://assets.ppy.sh/beatmaps/648659/covers/card.jpg">
+        <img class="img-cover" :src="`https://assets.ppy.sh/beatmaps/${this.beatmap_set.id}/covers/card.jpg`">
       </div>
     </div>
     <div class="content">
       <div class="play">
-
+        <font-awesome-icon :icon="['fas', 'play']"></font-awesome-icon>
       </div>
       <div class="info">
         <span class="song-title">{{ this.beatmap_set.title }}</span>
@@ -22,14 +22,44 @@
             {{ this.approved }}
           </div>
           <div class="diffs">
-            <div class="diff" v-for="beatmap in this.beatmap_set.maps"
-                 :style={background:this.diffColor(beatmap.difficult)}>
-            </div>
+            <Space align="center" v-if="this.osuMaps.length !== 0">
+              <img class="gamemode-icon" src="../assets/osu/mode-osu-small.png">
+              <div class="diff" v-for="beatmap in this.osuMaps"
+                   :style={background:this.diffColor(beatmap.difficult)}>
+              </div>
+            </Space>
+            <Space align="center" v-if="this.taikoMaps.length !== 0">
+              <img class="gamemode-icon" src="../assets/osu/mode-osu-small.png">
+              <div class="diff" v-for="beatmap in this.taikoMaps"
+                   :style={background:this.diffColor(beatmap.difficult)}>
+              </div>
+            </Space>
+            <Space align="center" v-if="this.catchMaps.length !== 0">
+              <img class="gamemode-icon" src="../assets/osu/mode-osu-small.png">
+              <div class="diff" v-for="beatmap in this.catchMaps"
+                   :style={background:this.diffColor(beatmap.difficult)}>
+              </div>
+            </Space>
+            <Space align="center" v-if="this.maniaMaps.length !== 0">
+              <img class="gamemode-icon" src="../assets/osu/mode-osu-small.png">
+              <div class="diff" v-for="beatmap in this.maniaMaps"
+                   :style={background:this.diffColor(beatmap.difficult)}>
+              </div>
+            </Space>
           </div>
         </Space>
       </div>
       <div class="menu">
-
+        <div class="menu-inner">
+          <Tooltip title="收藏铺面">
+            <font-awesome-icon :icon="['far', 'heart']" class="fa-icon"></font-awesome-icon>
+          </Tooltip>
+          <Tooltip title="下载">
+            <a :href="`https://dl.sayobot.cn/beatmaps/download/full/${this.beatmap_set.id}`">
+              <font-awesome-icon :icon="['fas', 'file-download']" class="fa-icon"></font-awesome-icon>
+            </a>
+          </Tooltip>
+        </div>
       </div>
     </div>
   </div>
@@ -39,13 +69,14 @@
 import {PropType} from "vue";
 import {Osu} from "@src/common/constant";
 import {PlayCircleOutlined} from "@ant-design/icons-vue";
-import {Space} from 'ant-design-vue'
+import {Space, Tooltip} from 'ant-design-vue'
 
 export default {
   name: "SongCard",
   components: {
     PlayCircleOutlined,
-    Space
+    Space,
+    Tooltip
   },
   props: {
     beatmap_set: {
@@ -54,18 +85,24 @@ export default {
     },
   },
   setup(props) {
-    console.log(props.beatmap_set);
+    console.log(props.beatmap_set.maps);
   },
   data() {
     return {
       colors: ["#4fbdfc", "#65ff84", "#adf94e",
         "#f9a55f", "#f9514e", "#a067ff"],
       diffs: [0, 2.00, 2.70, 4.00, 5.30, 6.50],
-      expertPurple: "#545ad6"
+      expertPurple: "#545ad6",
+      play: {
+        isPlaying: false,
+        isLoaded: false,
+        duration: 0,
+        progress: 0
+      }
     }
   },
   methods: {
-    HexToRgb(sColor: String): Number[] {
+    HexToRgb(sColor: string): Number[] | string {
       let reg = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
       sColor = sColor.toLowerCase();
       if (sColor && reg.test(sColor)) {
@@ -86,7 +123,7 @@ export default {
         return sColor;
       }
     },
-    RgbToHex(rgb: Number[]): String {
+    RgbToHex(rgb) {
       let _this = rgb;
       let reg = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
       if (/^(rgb|RGB)/.test(_this)) {
@@ -119,7 +156,7 @@ export default {
         return _this;
       }
     },
-    gradientColor(startColor: String, endColor: String, step: Number, index: Number): String {
+    gradientColor(startColor: string, endColor: string, step: Number, index: Number): string {
       let startRGB = this.HexToRgb(startColor);//转换为rgb数组模式
       let startR = startRGB[0];
       let startG = startRGB[1];
@@ -136,7 +173,7 @@ export default {
       return this.RgbToHex('rgb(' + parseInt((sR * index + startR)) + ',' + parseInt((sG * index + startG)) + ',' +
           parseInt((sB * index + startB)) + ')');
     },
-    diffColor(diff: Number): String {
+    diffColor(diff: Number): string {
       if (diff > 6.50) {
         return this.expertPurple;
       } else if (diff < 0) {
@@ -147,6 +184,18 @@ export default {
       const step = parseInt((this.diffs[index] - this.diffs[index - 1]) * 100);
       const i = parseInt((diff - this.diffs[index - 1]) * 100);
       return this.gradientColor(this.colors[index - 1], this.colors[index], step, i);
+    },
+    startPlaying() {
+
+    },
+    stopPlaying() {
+
+    },
+    pausePlaying() {
+
+    },
+    loading() {
+
     }
   },
   computed: {
@@ -155,6 +204,18 @@ export default {
     },
     approved() {
       return Osu.Approved[this.beatmap_set.Approved].toUpperCase();
+    },
+    osuMaps() {
+      return this.beatmap_set.maps.filter(v => v.mode == Osu.GameMode.osu);
+    },
+    taikoMaps() {
+      return this.beatmap_set.maps.filter(v => v.mode == Osu.GameMode.taiko);
+    },
+    catchMaps() {
+      return this.beatmap_set.maps.filter(v => v.mode == Osu.GameMode.catch);
+    },
+    maniaMaps() {
+      return this.beatmap_set.maps.filter(v => v.mode == Osu.GameMode.mania);
     }
   }
 }
@@ -222,8 +283,33 @@ export default {
       display: flex;
       align-items: center;
       justify-content: center;
-      //opacity: 0;
+      opacity: 0;
+      color: #fff;
       flex: none;
+      transition: all ease-in-out .15s;
+
+      &:hover {
+        color: hsl(45, 100%, 70%);
+      }
+
+      &::before, &::after {
+        content: '';
+        width: 10px;
+        height: 10px;
+        position: absolute;
+        background-color: inherit;
+        left: 100%;
+      }
+
+      &::before {
+        top: 0;
+        clip-path: path("M-1 -1 L-1 10 L0 10 A10 10 0 0 1 10 0 L10 -1 Z");
+      }
+
+      &::after {
+        bottom: 0;
+        clip-path: path("M-1 11 L-1 0 L0 0 A10 10 0 0 0 10 10 L10 11 Z");
+      }
     }
 
     .info {
@@ -236,7 +322,8 @@ export default {
       justify-content: space-between;
       padding: 4px 10px 6px;
       background: linear-gradient(0.25turn, hsl(200, 10%, 20%), hsla(200, 10%, 20%, 0.8));
-      //border-radius: @song-card-radius;
+      border-radius: 9px 0 0 9px;
+
       .song-title {
         font-size: 16px;
         font-weight: 600;
@@ -259,6 +346,11 @@ export default {
         flex-direction: row;
         justify-content: flex-start;
         align-items: center;
+
+        .gamemode-icon {
+          width: 20px;
+          height: 20px;
+        }
 
         .graveyard {
           background-color: hsl(200, 10%, 10%);
@@ -310,12 +402,74 @@ export default {
           justify-content: flex-start;
 
           .diff {
-            width: 6px;
-            height: 12px;
-            border-radius: 12px;
+            margin-top: 2px;
+            margin-right: 2px;
+            width: 7px;
+            height: 14px;
+            border-radius: 14px;
           }
         }
       }
+    }
+
+    .menu {
+      width: 10px;
+      background-color: hsl(200, 10%, 25%);
+      border-radius: 0 10px 10px 0;
+      transition: all .15s ease-in-out;
+      position: relative;
+
+      &::before, &::after {
+        content: '';
+        width: 10px;
+        height: 10px;
+        position: absolute;
+        background-color: inherit;
+        right: 100%;
+      }
+
+      &::before {
+        top: 0;
+        clip-path: path("M11 -1 L11 10 L10 10 A10 10 0 0 0 0 0 L0 -1 Z");
+      }
+
+      &::after {
+        bottom: 0;
+        clip-path: path("M11 11 L11 0 L10 0 A10 10 0 0 1 0 10 L 0 11 Z");
+      }
+
+      .menu-inner {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+        font-size: 12px;
+        transition: all .15s ease-in-out;
+
+        .fa-icon {
+          color: hsl(200, 40%, 90%);
+        }
+      }
+    }
+  }
+
+  &:hover {
+    .menu {
+      width: 30px;
+
+      .menu-inner {
+        opacity: 1;
+      }
+    }
+
+    .play {
+      opacity: 1;
     }
   }
 }

@@ -1,24 +1,25 @@
-import { createApp } from 'vue'
-import ElementPlus from 'element-plus'
+import {createApp} from 'vue'
 import App from './App'
 import router from './router'
+import {library} from '@fortawesome/fontawesome-svg-core'
+import {faFileDownload, faPlay} from '@fortawesome/free-solid-svg-icons'
+import {faHeart} from "@fortawesome/free-regular-svg-icons";
+import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
 
 // vite 会编译 import 的形式；所以 electron 及 node.js 内置模块用 require 形式
-const fs = require('fs')
-const { ipcRenderer } = require('electron')
-// const Store = require('electron-store')
+// const fs = require('fs')
+// const {ipcRenderer} = require('electron')
 
+import 'ant-design-vue/dist/antd.css'
 import '@/assets/style/boot4-part.less'
 import '@/assets/fonts/torus/torus.less'
 import './index.less'
-import 'element-plus/lib/theme-chalk/index.css'
 
-// console.log('fs', fs)
-// console.log('ipcRenderer:', ipcRenderer)
-// console.log('electron-store', new Store())
+library.add(faFileDownload, faHeart, faPlay)
+
 
 createApp(App)
-  .use(router)
-  .use(ElementPlus)
-  .mount('#app')
-  .$nextTick(window.ClosePreloadLoading)
+    .use(router)
+    .component('font-awesome-icon', FontAwesomeIcon)
+    .mount('#app')
+    .$nextTick(window.ClosePreloadLoading)

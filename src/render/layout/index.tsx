@@ -1,12 +1,11 @@
-import { defineComponent, } from 'vue'
-import { Layout, Menu } from 'ant-design-vue'
+import { defineComponent } from 'vue'
+import { Layout } from 'ant-design-vue'
 import Slider from './slider'
 import './index.less'
 
 export default defineComponent({
   name: 'layouts.tsx',
   setup(_, ctx) {
-
     return () => (
       <Layout class='app-layout h-100'>
         <Layout.Sider width={52}>

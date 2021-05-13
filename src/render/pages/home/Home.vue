@@ -16,6 +16,7 @@ export default {
   components: {SongCard},
   data() {
     var set: Osu.BeatmapSet = {
+      id: 93398,
       title: 'High-Priestess',
       creator: 'RikiH_',
       artist: 'Luxion',
@@ -28,6 +29,7 @@ export default {
       bpm: 196,
       maps: [
         {
+          id: 252002,
           name: 'Overkill',
           difficult: 5.30,
           mode: Osu.GameMode.osu,
