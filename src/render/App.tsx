@@ -6,10 +6,6 @@ export default defineComponent({
   setup() {
     const route = useRoute()
 
-    return () => route.path === '/login'
-      ? <RouterView />
-      : <AppLayout>
-        <RouterView />
-      </AppLayout>
+    return () => <RouterView />
   },
 })
