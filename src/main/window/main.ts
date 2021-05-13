@@ -16,7 +16,7 @@ export class Main extends WinSubscribe {
   public open() {
     this.win = new BrowserWindow({
       ...options,
-      title: '', // TODO: 添加窗口标题
+      title: 'SayoDownloader', // TODO: 添加窗口标题
       ...this.opts,
     })
     this.win.loadURL(this.url)

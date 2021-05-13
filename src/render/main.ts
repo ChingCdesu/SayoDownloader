@@ -9,6 +9,7 @@ const { ipcRenderer } = require('electron')
 // const Store = require('electron-store')
 
 import '@/assets/style/boot4-part.less'
+import '@/assets/fonts/torus/torus.less'
 import './index.less'
 import 'element-plus/lib/theme-chalk/index.css'
 

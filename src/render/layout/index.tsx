@@ -1,6 +1,6 @@
 import { defineComponent, } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import logo from '@/assets/logo.png'
+import { Layout, Menu } from 'ant-design-vue'
+import Slider from './slider'
 import './index.less'
 
 export default defineComponent({
@@ -8,10 +8,15 @@ export default defineComponent({
   setup(_, ctx) {
 
     return () => (
-      <div>
-        {/* 奇怪的写法: https://github.com/vuejs/composition-api/issues/84 */}
-        {ctx?.slots?.default?.()}
-      </div>
+      <Layout class='app-layout h-100'>
+        <Layout.Sider width={52}>
+          <Slider />
+        </Layout.Sider>
+        <Layout.Content>
+          {/* 奇怪的写法: https://github.com/vuejs/composition-api/issues/84 */}
+          {ctx?.slots?.default?.()}
+        </Layout.Content>
+      </Layout>
     )
   },
 })

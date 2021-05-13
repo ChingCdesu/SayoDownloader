@@ -1,8 +1,8 @@
 import { defineComponent } from 'vue'
-import App from '@/App.vue'
+import Home from './Home.vue'
 
 export default defineComponent({
   setup() {
-    return () => <App />
+    return () => <Home />
   }
 })

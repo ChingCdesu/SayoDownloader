@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
+import {CloudDownloadOutlined, HomeOutlined, SettingOutlined, UserOutlined} from '@ant-design/icons-vue'
 
 export interface RouteMeta {
   icon?: JSX.Element
@@ -10,9 +11,25 @@ export const routes: RouteRecordRaw[] = [
     path: '/',
     component: () => import('@/pages/home'),
     meta: {
-      // icon: null,
+      icon: <HomeOutlined />,
       name: '首页',
-    },
+    } as RouteMeta,
+  },
+  {
+    path: '/downloads',
+    component: () => import('@/pages/downloads'),
+    meta: {
+      icon: <CloudDownloadOutlined />,
+      name: '下载'
+    } as RouteMeta
+  },
+  {
+    path: '/settings',
+    component: () => import('@/pages/settings'),
+    meta: {
+      icon: <SettingOutlined />,
+      name: '设置'
+    } as RouteMeta
   }
 ]
 
