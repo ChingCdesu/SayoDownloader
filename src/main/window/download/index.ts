@@ -278,6 +278,10 @@ const clearDownloadDone = () => {
   return deleteSourceItem(downloadItemData)
 }
 
+const getDownloadPath = () => {
+  return app.getPath('downloads')
+}
+
 // 添加主进程 ipc 调用事件
 const listenerEvent = () => {
   // 打开下载管理器
@@ -316,6 +320,8 @@ const listenerEvent = () => {
   ipcMainHandle('removeDownloadItem', (event, item: IDownloadFile, index: number) =>
     removeDownloadItem(item, index),
   )
+  // 获取下载文件夹路径
+  ipcMainHandle('getDownloadPath', () => getDownloadPath())
 
   // 调用 download 方法后，触发 will-download 事件
   session.defaultSession.on('will-download', listenerDownload)

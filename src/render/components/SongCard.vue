@@ -22,12 +22,12 @@
         <span class="song-title">{{ this.beatmap_set.title }}</span>
         <span class="song-artist">艺术家: {{ this.beatmap_set.artist }}</span>
         <span class="song-creator">作图者: {{ this.beatmap_set.creator }}</span>
-        <Space class="song-maps">
+        <a-space class="song-maps">
           <div :class="this.approvedClass">
             {{ this.approved }}
           </div>
           <div class="diffs">
-            <Space align="center" v-if="this.osuMaps.length !== 0">
+            <a-space align="center" v-if="this.osuMaps.length !== 0">
               <img
                 class="gamemode-icon"
                 src="../assets/osu/mode-osu-small.png"
@@ -37,8 +37,8 @@
                 v-for="beatmap in this.osuMaps"
                 :style="{ background: this.diffColor(beatmap.difficult) }"
               ></div>
-            </Space>
-            <Space align="center" v-if="this.taikoMaps.length !== 0">
+            </a-space>
+            <a-space align="center" v-if="this.taikoMaps.length !== 0">
               <img
                 class="gamemode-icon"
                 src="../assets/osu/mode-osu-small.png"
@@ -48,8 +48,8 @@
                 v-for="beatmap in this.taikoMaps"
                 :style="{ background: this.diffColor(beatmap.difficult) }"
               ></div>
-            </Space>
-            <Space align="center" v-if="this.catchMaps.length !== 0">
+            </a-space>
+            <a-space align="center" v-if="this.catchMaps.length !== 0">
               <img
                 class="gamemode-icon"
                 src="../assets/osu/mode-osu-small.png"
@@ -59,8 +59,8 @@
                 v-for="beatmap in this.catchMaps"
                 :style="{ background: this.diffColor(beatmap.difficult) }"
               ></div>
-            </Space>
-            <Space align="center" v-if="this.maniaMaps.length !== 0">
+            </a-space>
+            <a-space align="center" v-if="this.maniaMaps.length !== 0">
               <img
                 class="gamemode-icon"
                 src="../assets/osu/mode-osu-small.png"
@@ -70,19 +70,19 @@
                 v-for="beatmap in this.maniaMaps"
                 :style="{ background: this.diffColor(beatmap.difficult) }"
               ></div>
-            </Space>
+            </a-space>
           </div>
-        </Space>
+        </a-space>
       </div>
       <div class="menu">
         <div class="menu-inner">
-          <Tooltip title="收藏铺面">
+          <a-tooltip title="收藏铺面">
             <font-awesome-icon
               :icon="['far', 'heart']"
               class="fa-icon"
             ></font-awesome-icon>
-          </Tooltip>
-          <Tooltip title="下载">
+          </a-tooltip>
+          <a-tooltip title="下载">
             <a
               :href="`https://dl.sayobot.cn/beatmaps/download/full/${this.beatmap_set.id}`"
             >
@@ -91,7 +91,7 @@
                 class="fa-icon"
               ></font-awesome-icon>
             </a>
-          </Tooltip>
+          </a-tooltip>
         </div>
       </div>
     </div>
@@ -102,14 +102,11 @@
 import { PropType } from "vue";
 import { Osu } from "@src/common/constant";
 import { PlayCircleOutlined } from "@ant-design/icons-vue";
-import { Space, Tooltip } from "ant-design-vue";
 
 export default {
   name: "SongCard",
   components: {
     PlayCircleOutlined,
-    Space,
-    Tooltip,
   },
   props: {
     beatmap_set: {
@@ -117,9 +114,9 @@ export default {
       require: true,
     },
   },
-  setup(props) {
-    console.log(props.beatmap_set.maps);
-  },
+  // setup(props) {
+  //   console.log(props.beatmap_set.maps);
+  // },
   data() {
     return {
       colors: [

@@ -291,6 +291,13 @@
     "@babel/helper-validator-identifier" "^7.14.0"
     to-fast-properties "^2.0.0"
 
+"@cliqz/url-parser@^1.1.4":
+  version "1.1.4"
+  resolved "https://registry.nlark.com/@cliqz/url-parser/download/@cliqz/url-parser-1.1.4.tgz#d26060d897420a3c2211f7c20d6d386f04ca910e"
+  integrity sha1-0mBg2JdCCjwiEffCDW04bwTKkQ4=
+  dependencies:
+    tldts-experimental "^5.3.1"
+
 "@ctrl/tinycolor@^3.3.1":
   version "3.4.0"
   resolved "https://registry.npm.taobao.org/@ctrl/tinycolor/download/@ctrl/tinycolor-3.4.0.tgz#c3c5ae543c897caa9c2a68630bed355be5f9990f"
@@ -3149,6 +3156,18 @@ temp-file@^3.3.7, temp-file@^3.4.0:
   dependencies:
     async-exit-hook "^2.0.1"
     fs-extra "^10.0.0"
+
+tldts-core@^5.7.35:
+  version "5.7.35"
+  resolved "https://registry.nlark.com/tldts-core/download/tldts-core-5.7.35.tgz#58bcb1a35dadae3727e46b39a0adb92f46ef7782"
+  integrity sha1-WLyxo12trjcn5Gs5oK25L0bvd4I=
+
+tldts-experimental@^5.3.1:
+  version "5.7.35"
+  resolved "https://registry.nlark.com/tldts-experimental/download/tldts-experimental-5.7.35.tgz#9cbc98e0c03d6777e8936fdbcd4ab5441ba2e085"
+  integrity sha1-nLyY4MA9Z3fok2/bzUq1RBui4IU=
+  dependencies:
+    tldts-core "^5.7.35"
 
 tmp-promise@^3.0.2:
   version "3.0.2"

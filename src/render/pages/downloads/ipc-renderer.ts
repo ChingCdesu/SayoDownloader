@@ -31,11 +31,6 @@ export const ipcRendererInvoke = <T>(eventName: IPCEventName, ...args: any[]): P
 Electron.ipcRenderer.invoke(eventName, ...args)
 
 /**
- * 获取下载路径
- */
-export const getDownloadPath = (): string => Electron.remote.app.getPath('downloads')
-
-/**
  * 打开文件
  * @param path - 路径
  */
@@ -102,6 +97,12 @@ export const removeDownloadItem = (item: IDownloadFile, index: number): Promise<
  */
 export const clearDownloadDone = (): Promise<IDownloadFile[]> =>
   ipcRendererInvoke('clearDownloadDone')
+
+/**
+ * 获取下载路径
+ */
+export const getDownloadPath = (): Promise<string> =>
+  ipcRendererInvoke('getDownloadPath')
 
 /**
  * 监听新建下载项事件

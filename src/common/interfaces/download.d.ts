@@ -17,6 +17,7 @@ export type IPCEventName =
     | 'newDownloadItem'
     | 'downloadItemUpdate'
     | 'downloadItemDone'
+    | 'getDownloadPath'
 
 export interface INewDownloadFile {
     url: string

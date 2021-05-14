@@ -65,6 +65,7 @@
     "vue-router": "^4.0.5"
   },
   "devDependencies": {
+    "@cliqz/url-parser": "^1.1.4",
     "@rollup/plugin-alias": "^3.1.2",
     "@rollup/plugin-commonjs": "^17.1.0",
     "@rollup/plugin-json": "^4.1.0",
