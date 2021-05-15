@@ -100,7 +100,8 @@
 
 <script lang="ts">
 import { PropType } from "vue";
-import { Osu } from "@src/common/constant";
+import {BeatmapSet} from "@src/common/interfaces/osu";
+import {GameMode, Approved} from "@src/common/enums/osu"
 import { PlayCircleOutlined } from "@ant-design/icons-vue";
 
 export default {
@@ -110,7 +111,7 @@ export default {
   },
   props: {
     beatmap_set: {
-      type: Object as PropType<Osu.BeatmapSet>,
+      type: Object as PropType<BeatmapSet>,
       require: true,
     },
   },
@@ -243,22 +244,22 @@ export default {
   },
   computed: {
     approvedClass() {
-      return Osu.Approved[this.beatmap_set.Approved] + " approved-status";
+      return Approved[this.beatmap_set.Approved] + " approved-status";
     },
     approved() {
-      return Osu.Approved[this.beatmap_set.Approved].toUpperCase();
+      return Approved[this.beatmap_set.Approved].toUpperCase();
     },
     osuMaps() {
-      return this.beatmap_set.maps.filter(v => v.mode == Osu.GameMode.osu);
+      return this.beatmap_set.maps.filter(v => v.mode == GameMode.osu);
     },
     taikoMaps() {
-      return this.beatmap_set.maps.filter(v => v.mode == Osu.GameMode.taiko);
+      return this.beatmap_set.maps.filter(v => v.mode == GameMode.taiko);
     },
     catchMaps() {
-      return this.beatmap_set.maps.filter(v => v.mode == Osu.GameMode.catch);
+      return this.beatmap_set.maps.filter(v => v.mode == GameMode.catch);
     },
     maniaMaps() {
-      return this.beatmap_set.maps.filter(v => v.mode == Osu.GameMode.mania);
+      return this.beatmap_set.maps.filter(v => v.mode == GameMode.mania);
     },
   },
 };

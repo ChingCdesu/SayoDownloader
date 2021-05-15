@@ -41,7 +41,6 @@
         </a-list-item>
       </template>
     </a-list>
-     <a-button type="primary" :onClick="this.btnClick">测试</a-button>
     <div class="fixed-footer">
       <a-space>
         <div>
@@ -66,39 +65,30 @@ import {
   openFile,
   openFileInFolder,
   clearDownloadDone,
+  listenerNewDownloadItem,
   listenerDownloadItemUpdate,
   listenerDownloadItemDone
-} from "./ipc-renderer";
+} from "@/hooks/download/ipc-renderer";
 
 import {
   INewDownloadFile,
-  IDownloadFile, DownloadItemState, IDownloadBytes,
+  IDownloadFile,
+  DownloadItemState,
+  IDownloadBytes,
 } from "@src/common/interfaces/download";
 
-import {createVNode, onMounted, ref, Ref, VNode} from "vue";
+import {onMounted, ref, Ref} from "vue";
 import {URL} from "@cliqz/url-parser";
 
 export default {
   name: "downloads",
   setup() {
     let bytes: Ref<IDownloadBytes> = ref({receivedBytes: 0, totalBytes: 0})
-    let dh: Ref<IDownloadFile[]> = ref([
-      {
-        id: "123",
-        url: "https://test.com?filename=93398%20Luxion%20-%20High-Priestess",
-        icon: "p",
-        fileName: "Luxion - High-Priestess.osz",
-        path: "/path/to/file",
-        state: "progressing",
-        startTime: Date.now(),
-        speed: 12135,
-        progress: 0.5,
-        totalBytes: 124,
-        receivedBytes: 62,
-        paused: false,
-        _sourceItem: undefined,
-      }
-    ])
+    let dh: Ref<IDownloadFile[]> = ref([])
+    onMounted(async () => {
+      dh.value = await getDownloadData({pageIndex: 1, pageCount: 10});
+    })
+
     const getDownloadBytes = () => {
       const data = dh.value
       const allBytes = data.reduce<IDownloadBytes>(
@@ -114,8 +104,7 @@ export default {
       )
       return allBytes
     }
-
-    listenerDownloadItemUpdate((event, item: IDownloadFile) => {
+    const handleUpdate = (event, item: IDownloadFile) => {
       const index = dh.value.findIndex(d => d.id === item.id)
       if (index < 0) {
         dh.value.unshift(item)
@@ -123,39 +112,16 @@ export default {
         dh.value[index] = item
       }
       bytes.value = getDownloadBytes()
-    })
+    }
+    // add listeners
+    listenerNewDownloadItem(handleUpdate)
+    listenerDownloadItemUpdate(handleUpdate)
+    listenerDownloadItemDone(handleUpdate)
 
-    listenerDownloadItemDone((event, item: IDownloadFile) => {
-      const index = dh.value.findIndex(d => d.id === item.id)
-      if (index < 0) {
-        dh.value.unshift(item)
-      } else {
-        dh.value[index] = item
-      }
-      bytes.value = getDownloadBytes()
-    })
     return {
       dh, bytes,
     }
-
-    // onMounted(async () => {
-    //   dh.value = await getDownloadData({ pageIndex: 1, pageCount: 10 });
-    // })
-
   },
-  // data() {
-  //   const bytes: IDownloadBytes = {
-  //     totalBytes: 123723,
-  //     receivedBytes: 127
-  //   }
-  //   const dh: IDownloadFile[] = [
-  //     ,
-  //   ];
-  //   return {
-  //     dh,
-  //     bytes
-  //   };
-  // },
   methods: {
     async btnClick(event) {
       const file: INewDownloadFile = {
@@ -204,6 +170,10 @@ export default {
 
   .ant-page-header-heading-title {
     color: rgba(255, 255, 255, .85);
+  }
+
+  .ant-empty-description {
+    color: #fff;
   }
 
   .download-items {

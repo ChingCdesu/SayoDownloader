@@ -205,7 +205,6 @@ const downloadFile = (newItem: INewDownloadFile) => {
   const downloadPath = pathJoin(savePath, newFileName)
   // 查找下载记录中是否存在历史下载
   const existItem = isExistItem(url, downloadItemData)
-
   newItem.fileName = newFileName
   newItem.path = downloadPath
 

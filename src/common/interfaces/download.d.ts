@@ -1,4 +1,4 @@
-import { DownloadItem, WebContents } from 'electron'
+import { DownloadItem } from 'electron'
 
 export type DownloadItemState = 'progressing' | 'completed' | 'cancelled' | 'interrupted'
 

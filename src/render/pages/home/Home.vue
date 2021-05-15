@@ -8,23 +8,24 @@
 </template>
 
 <script lang="ts">
-import {Osu} from "@src/common/constant";
-import SongCard from "@/components/SongCard.vue";
+import {BeatmapSet} from '@src/common/interfaces/osu'
+import {GameMode, Approved, Language, Genre} from "@src/common/enums/osu"
+import SongCard from '@/components/SongCard.vue';
 
 export default {
   name: 'home',
   components: {SongCard},
   data() {
-    var set: Osu.BeatmapSet = {
+    var set: BeatmapSet = {
       id: 93398,
       title: 'High-Priestess',
       creator: 'RikiH_',
       artist: 'Luxion',
-      Approved: Osu.Approved.ranked,
+      Approved: Approved.ranked,
       tags: ['kloyd', 'flower', 'roxas'],
       sources: ['BMS'],
-      language: Osu.Language.instrumental,
-      genre: Osu.Genre.video_game,
+      language: Language.instrumental,
+      genre: Genre.video_game,
       duration: 146,
       bpm: 196,
       maps: [
@@ -32,14 +33,14 @@ export default {
           id: 252002,
           name: 'Overkill',
           difficult: 5.30,
-          mode: Osu.GameMode.osu,
+          mode: GameMode.osu,
           circle_count: 388,
           slider_count: 222,
           spinner_count: 3,
           map_diff: {
             cs: 4,
             od: 8,
-            ap: 9,
+            ar: 9,
             hp: 7
           }
         }
@@ -57,6 +58,7 @@ export default {
   min-height: 100vh;
   background-color: hsl(200, 10%, 15%);
   padding: 10px 8px;
+
   .beatmapsets {
   }
 }
