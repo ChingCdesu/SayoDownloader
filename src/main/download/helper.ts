@@ -99,7 +99,7 @@ export const setTaskbar = (
   if (win) {
     win.setProgressBar(count < 1 ? -1 : progress)
   }
-  
+
   if (process.platform === 'darwin') {
     app.badgeCount = count
   }

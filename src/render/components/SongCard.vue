@@ -244,10 +244,10 @@ export default {
   },
   computed: {
     approvedClass() {
-      return Approved[this.beatmap_set.Approved] + " approved-status";
+      return Approved[this.beatmap_set.approved] + " approved-status";
     },
     approved() {
-      return Approved[this.beatmap_set.Approved].toUpperCase();
+      return Approved[this.beatmap_set.approved].toUpperCase();
     },
     osuMaps() {
       return this.beatmap_set.maps.filter(v => v.mode == GameMode.osu);

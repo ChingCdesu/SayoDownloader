@@ -3,12 +3,9 @@
  */
 import { join } from 'path'
 import { app, session } from 'electron'
-import { Main, registerDownloadService } from './window'
-import store from '@src/common/utils/store'
+import { Main, registerDownloadService, registerApiService } from './window'
+import Store from 'electron-store'
 import dotenv from 'dotenv'
-import {
-  TOGGLE_DEVTOOLS,
-} from '@src/common/constant/event'
 
 dotenv.config({ path: join(__dirname, '../../.env') })
 
@@ -22,9 +19,7 @@ function init() {
   const mainOpen = () => {
     mainWin.open()
     registerDownloadService(mainWin.win);
-    const unsubscribeDevtool = mainWin.subscribe(TOGGLE_DEVTOOLS, win => {
-      mainWin.win?.webContents.toggleDevTools()
-    })
+    registerApiService()
   }
   mainOpen()
 }

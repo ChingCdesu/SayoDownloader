@@ -1,1 +1,1 @@
-export * as event from './event'
+export const VERSION = '0.0.1'

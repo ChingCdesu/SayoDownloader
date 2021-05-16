@@ -104,6 +104,9 @@ export const clearDownloadDone = (): Promise<IDownloadFile[]> =>
 export const getDownloadPath = (): Promise<string> =>
   ipcRendererInvoke('getDownloadPath')
 
+export const getDownloadItemCount = (): Promise<number> =>
+    ipcRendererInvoke('getDownloadItemCount')
+
 /**
  * 监听新建下载项事件
  * @param callback - 回调函数
