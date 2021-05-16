@@ -16,7 +16,7 @@
         <tr>
           <td class="condition-header" width="60">分类</td>
           <td class="condition-content">
-            <a-checkbox-group :options="approvedOptions" @change="e => this.filter.approved = e" />
+            <a-checkbox-group :options="approvedOptions" @change="e => this.filter.approved = e"/>
           </td>
         </tr>
         <tr>
@@ -35,18 +35,25 @@
       </table>
     </div>
     <div class="beatmapsets">
-      <SongCard :beatmap_set='set'></SongCard>
+      <a-row :gutter="[16, 16]" v-for="index in parseInt(this.sets.length / 2)" style="width: 100%">
+        <a-col :span="12">
+          <SongCard :beatmap_set="this.sets[(index - 1) * 2]"/>
+        </a-col>
+        <a-col :span="12">
+          <SongCard :beatmap_set="this.sets[(index - 1) * 2 + 1]"/>
+        </a-col>
+      </a-row>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import {BeatmapSet} from '@src/common/interfaces/osu'
-import {Approved, GameMode, Genre, Language} from "@src/common/enums/osu"
+import { IBeatmapSet } from '@src/common/interfaces/osu'
 import SongCard from '@/components/SongCard.vue';
-// import {get, post} from '@/hooks/api'
-import axios from "axios";
-import {onMounted} from "vue";
+import { apiData2IBeatmapSet } from "@src/common/utils/data-trans";
+import Api from '@src/common/utils/api'
+import { onMounted, Ref, ref } from "vue";
+import { IApiBeatmapSet } from "@src/common/interfaces/api.osu";
 
 interface IBeatmapListParams {
   cmd: string,
@@ -89,51 +96,32 @@ export default {
   name: 'home',
   components: {SongCard},
   setup() {
-    let sets: BeatmapSet[] = []
+    let sets: Ref<IBeatmapSet[]> = ref([])
+    let error: Ref<boolean> = ref(false)
     onMounted(async () => {
-      const result = await axios.post('https://api.sayobot.cn/?post', {
-          cwd: 'beatmaplist',
-          type: 'hot',
-          limit: 20
-      }, {
-
+      const result = await Api.post('/?post', {
+        cmd: 'beatmaplist',
+        type: 'hot',
+        limit: 20
       })
-      console.log(result)
+      if (!result || result.status !== 200) {
+        error.value = true
+        return
+      }
+      for (var i = 0; i < result.data.data.length; ++i) {
+        const sid = result.data.data[i].sid
+        const info = await Api.get(`/v2/beatmapinfo?K=${sid}`)
+        if (!info || result.status !== 200) {
+          error.value = true
+          return
+        }
+        const beatmapset = info.data.data as IApiBeatmapSet
+        sets.value.push(apiData2IBeatmapSet(beatmapset))
+      }
     })
-    // console.log(sets)
-    return { sets }
+    return {sets, error}
   },
   data() {
-    let set: BeatmapSet = {
-      id: 93398,
-      title: 'High-Priestess',
-      creator: 'RikiH_',
-      artist: 'Luxion',
-      approved: Approved.ranked,
-      tags: ['kloyd', 'flower', 'roxas'],
-      sources: ['BMS'],
-      language: Language.instrumental,
-      genre: Genre.video_game,
-      duration: 146,
-      bpm: 196,
-      maps: [
-        {
-          id: 252002,
-          name: 'Overkill',
-          difficult: 5.30,
-          mode: GameMode.osu,
-          circle_count: 388,
-          slider_count: 222,
-          spinner_count: 3,
-          map_diff: {
-            cs: 4,
-            od: 8,
-            ar: 9,
-            hp: 7
-          }
-        }
-      ]
-    }
     var filter: IBeatmapFilter = {}
     const limit: number = 20
     let page = 1
@@ -177,7 +165,7 @@ export default {
       {label: '意大利语', value: 2048},
     ]
     return {
-      set, filter, limit, page, modeOptions, approvedOptions, genreOptions, languageOptions
+      filter, limit, page, modeOptions, approvedOptions, genreOptions, languageOptions
     }
   },
   methods: {
@@ -279,6 +267,7 @@ export default {
   }
 
   .beatmapsets {
+    width: 100%;
   }
 }
 </style>

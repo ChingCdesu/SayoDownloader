@@ -8,5 +8,5 @@ src/main/_.js
 src/main/_.js.map
 tmp
 **/.tmp
-release
+release/
 .vscode

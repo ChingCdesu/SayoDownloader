@@ -512,11 +512,6 @@
   resolved "https://registry.nlark.com/@types/node/download/@types/node-15.0.2.tgz#51e9c0920d1b45936ea04341aa3e2e58d339fb67"
   integrity sha1-UenAkg0bRZNuoENBqj4uWNM5+2c=
 
-"@types/node@^12.0.12":
-  version "12.20.13"
-  resolved "https://registry.nlark.com/@types/node/download/@types/node-12.20.13.tgz#e743bae112bd779ac9650f907197dd2caa7f0364"
-  integrity sha1-50O64RK9d5rJZQ+QcZfdLKp/A2Q=
-
 "@types/node@^14.6.2":
   version "14.14.44"
   resolved "https://registry.nlark.com/@types/node/download/@types/node-14.14.44.tgz#df7503e6002847b834371c004b372529f3f85215"
@@ -693,7 +688,7 @@ ajv@^6.10.0, ajv@^6.12.0:
 
 ajv@^7.0.0, ajv@^7.0.3:
   version "7.2.4"
-  resolved "https://registry.nlark.com/ajv/download/ajv-7.2.4.tgz?cache=0&sync_timestamp=1620560175687&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fajv%2Fdownload%2Fajv-7.2.4.tgz#8e239d4d56cf884bccca8cca362f508446dc160f"
+  resolved "https://registry.nlark.com/ajv/download/ajv-7.2.4.tgz?cache=0&sync_timestamp=1621023838921&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fajv%2Fdownload%2Fajv-7.2.4.tgz#8e239d4d56cf884bccca8cca362f508446dc160f"
   integrity sha1-jiOdTVbPiEvMyozKNi9QhEbcFg8=
   dependencies:
     fast-deep-equal "^3.1.1"
@@ -850,21 +845,6 @@ atomically@^1.7.0:
   version "1.7.0"
   resolved "https://registry.npm.taobao.org/atomically/download/atomically-1.7.0.tgz?cache=0&sync_timestamp=1605101327415&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fatomically%2Fdownload%2Fatomically-1.7.0.tgz#c07a0458432ea6dbc9a3506fffa424b48bccaafe"
   integrity sha1-wHoEWEMuptvJo1Bv/6QktIvMqv4=
-
-axios-electron-adapter@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.nlark.com/axios-electron-adapter/download/axios-electron-adapter-1.0.2.tgz#ca0fd430366e0fb8b9a97747e994eb90163e4087"
-  integrity sha1-yg/UMDZuD7i5qXdH6ZTrkBY+QIc=
-  dependencies:
-    axios "^0.19.2"
-    electron "^7.1.12"
-
-axios@^0.19.2:
-  version "0.19.2"
-  resolved "https://registry.npm.taobao.org/axios/download/axios-0.19.2.tgz?cache=0&sync_timestamp=1608609188013&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Faxios%2Fdownload%2Faxios-0.19.2.tgz#3ea36c5d8818d0d5f8a8a97a6d36b86cdc00cb27"
-  integrity sha1-PqNsXYgY0NX4qKl6bTa4bNwAyyc=
-  dependencies:
-    follow-redirects "1.5.10"
 
 axios@^0.21.1:
   version "0.21.1"
@@ -1348,13 +1328,6 @@ debounce-fn@^4.0.0:
   dependencies:
     mimic-fn "^3.0.0"
 
-debug@=3.1.0:
-  version "3.1.0"
-  resolved "https://registry.npm.taobao.org/debug/download/debug-3.1.0.tgz?cache=0&sync_timestamp=1607566571506&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fdebug%2Fdownload%2Fdebug-3.1.0.tgz#5bb5a0672628b64149566ba16819e61518c67261"
-  integrity sha1-W7WgZyYotkFJVmuhaBnmFRjGcmE=
-  dependencies:
-    ms "2.0.0"
-
 debug@^2.6.9:
   version "2.6.9"
   resolved "https://registry.npm.taobao.org/debug/download/debug-2.6.9.tgz?cache=0&sync_timestamp=1607566580543&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fdebug%2Fdownload%2Fdebug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
@@ -1572,15 +1545,6 @@ electron@12.0.1:
     "@types/node" "^14.6.2"
     extract-zip "^1.0.3"
 
-electron@^7.1.12:
-  version "7.3.3"
-  resolved "https://registry.nlark.com/electron/download/electron-7.3.3.tgz#f61502a3d42d85adfecd8e37f98da449b591f8af"
-  integrity sha1-9hUCo9Qtha3+zY43+Y2kSbWR+K8=
-  dependencies:
-    "@electron/get" "^1.0.1"
-    "@types/node" "^12.0.12"
-    extract-zip "^1.0.3"
-
 emoji-regex@^7.0.1:
   version "7.0.3"
   resolved "https://registry.npm.taobao.org/emoji-regex/download/emoji-regex-7.0.3.tgz?cache=0&sync_timestamp=1614682707048&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Femoji-regex%2Fdownload%2Femoji-regex-7.0.3.tgz#933a04052860c85e83c122479c4748a8e4c72156"
@@ -1720,13 +1684,6 @@ find-up@^4.1.0:
   dependencies:
     locate-path "^5.0.0"
     path-exists "^4.0.0"
-
-follow-redirects@1.5.10:
-  version "1.5.10"
-  resolved "https://registry.nlark.com/follow-redirects/download/follow-redirects-1.5.10.tgz?cache=0&sync_timestamp=1620555300559&other_urls=https%3A%2F%2Fregistry.nlark.com%2Ffollow-redirects%2Fdownload%2Ffollow-redirects-1.5.10.tgz#7b7a9f9aea2fdff36786a94ff643ed07f4ff5e2a"
-  integrity sha1-e3qfmuov3/NnhqlP9kPtB/T/Xio=
-  dependencies:
-    debug "=3.1.0"
 
 follow-redirects@^1.10.0:
   version "1.14.1"

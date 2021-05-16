@@ -1,6 +1,4 @@
 import axios, {AxiosInstance, AxiosRequestConfig} from "axios";
-import {VERSION} from "@src/common/constant";
-import {ipcMain} from 'electron'
 
 const singletonEnforcer = Symbol('api singleton enforcer')
 
@@ -11,9 +9,6 @@ class ApiService {
         }
         this._instance = axios.create({
             baseURL: 'https://api.sayobot.cn',
-            headers: {
-                'User-Agent': `SayoDownloader v${VERSION} powered by Electron`
-            }
         })
     }
 
@@ -31,12 +26,4 @@ class ApiService {
     }
 }
 
-export const registerApiService =  () => {
-    ipcMain.handle('axios-get', async (event, url: string, config?: AxiosRequestConfig) => {
-        return await ApiService.instance.get(url, config)
-    })
-
-    ipcMain.handle('axios-post', async (event, url: string, config?: AxiosRequestConfig) => {
-        return await ApiService.instance.post(url, config)
-    })
-}
+export default ApiService.instance

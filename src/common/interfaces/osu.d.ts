@@ -1,13 +1,13 @@
 import {GameMode, Approved, Language, Genre} from "@src/common/enums/osu"
 
-export interface MapDiffSettings {
+export interface IMapDiffSettings {
     cs: Number,
     hp: Number,
     od: Number,
     ar: Number
 }
 
-export interface Beatmap {
+export interface IBeatmap {
     id: Number,
     name: String,
     difficult: Number,
@@ -15,10 +15,10 @@ export interface Beatmap {
     circle_count: Number,
     slider_count: Number,
     spinner_count: Number,
-    map_diff: MapDiffSettings
+    map_diff: IMapDiffSettings
 }
 
-export interface BeatmapSet {
+export interface IBeatmapSet {
     id: Number,
     title: String,
     titleU?: String,
@@ -32,5 +32,5 @@ export interface BeatmapSet {
     genre: Genre,
     duration: Number,
     bpm: Number,
-    maps: Beatmap[]
+    maps: IBeatmap[]
 }
