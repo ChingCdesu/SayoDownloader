@@ -3,142 +3,185 @@
     <div class="covers">
       <div class="left-cover">
         <img
-            class="img-cover"
-            :src="`https://assets.ppy.sh/beatmaps/${this.beatmap_set.id}/covers/list@2x.jpg`"
+          class="img-cover"
+          :src="`https://assets.ppy.sh/beatmaps/${this.beatmap_set.id}/covers/list@2x.jpg`"
         />
       </div>
       <div class="right-cover">
         <img
-            class="img-cover"
-            :src="`https://assets.ppy.sh/beatmaps/${this.beatmap_set.id}/covers/card.jpg`"
+          class="img-cover"
+          :src="`https://assets.ppy.sh/beatmaps/${this.beatmap_set.id}/covers/card.jpg`"
         />
       </div>
     </div>
     <div class="content">
       <div class="play">
-        <font-awesome-icon :icon="['fas', 'play']"/>
+        <font-awesome-icon :icon="['fas', 'play']" />
       </div>
       <div class="info" @click="showModal">
         <span class="song-title info-text">{{ this.beatmap_set.title }}</span>
-        <span class="song-artist info-text">作曲/歌手: {{ this.beatmap_set.artist }}</span>
-        <span class="song-creator info-text">作图者: {{ this.beatmap_set.creator }}</span>
-        <a-popover color="transparent" overlayClassName="beatmap-popover"
-                   :getPopupContainer="triggerNode=> triggerNode.parentNode.parentNode.parentNode">
-          <template #content>
-            <div class="diff-details">
-              <a-space class="diff-detail" :size="4" align="baseline" v-for="map in this.beatmap_set.maps">
-                <img
-                    class="gamemode-icon"
-                    :src="this.getModePic(map.mode)"
-                />
-                <span class="stars" :style="{background: this.diffColor(map.difficult)}">
-                <font-awesome-icon :icon="['fas', 'star']"/>
-                {{ map.difficult.toFixed(2) }}
-              </span>
-                <span>{{ map.name }}</span>
-              </a-space>
-            </div>
-          </template>
-          <a-space class="song-maps-inner">
-            <div :class="this.approvedClass">
-              {{ this.approved }}
-            </div>
-            <div class="diffs">
-              <a-space align="center" v-if="this.osuMaps.length !== 0" :size="this.diffspace">
-                <img
-                    class="gamemode-icon"
-                    src="../assets/osu/mode-osu-small.png"
-                />
-                <div
-                    class="diff"
-                    v-if="this.beatmap_set.maps.length < 15"
-                    v-for="beatmap in this.osuMaps"
-                    :style="{ background: this.diffColor(beatmap.difficult) }"
-                ></div>
-                <span v-if="this.beatmap_set.maps.length >= 15" class="diff-count">
+        <span class="song-artist info-text"
+          >作曲/歌手: {{ this.beatmap_set.artist }}</span
+        >
+        <span class="song-creator info-text"
+          >作图者: {{ this.beatmap_set.creator }}</span
+        >
+        <a-space
+          class="song-maps-inner"
+          @mouseleave="this.mouseInDiffsDiv = false"
+          @mouseenter="this.mouseInDiffsDiv = true"
+        >
+          <div :class="this.approvedClass">
+            {{ this.approved }}
+          </div>
+          <div class="diffs">
+            <a-space
+              align="center"
+              v-if="this.osuMaps.length !== 0"
+              :size="this.diffspace"
+            >
+              <img
+                class="gamemode-icon"
+                src="../assets/osu/mode-osu-small.png"
+              />
+              <div
+                class="diff"
+                v-if="this.beatmap_set.maps.length < 15"
+                v-for="beatmap in this.osuMaps"
+                :style="{ background: this.diffColor(beatmap.difficult) }"
+              ></div>
+              <span
+                v-if="this.beatmap_set.maps.length >= 15"
+                class="diff-count"
+              >
                 {{ this.osuMaps.length }}
               </span>
-              </a-space>
-              <a-space align="center" v-if="this.taikoMaps.length !== 0" :size="this.diffspace">
-                <img
-                    class="gamemode-icon"
-                    src="../assets/osu/mode-taiko-small.png"
-                />
-                <div
-                    class="diff"
-                    v-if="this.beatmap_set.maps.length < 15"
-                    v-for="beatmap in this.taikoMaps"
-                    :style="{ background: this.diffColor(beatmap.difficult) }"
-                ></div>
-                <span v-if="this.beatmap_set.maps.length >= 15" class="diff-count">
+            </a-space>
+            <a-space
+              align="center"
+              v-if="this.taikoMaps.length !== 0"
+              :size="this.diffspace"
+            >
+              <img
+                class="gamemode-icon"
+                src="../assets/osu/mode-taiko-small.png"
+              />
+              <div
+                class="diff"
+                v-if="this.beatmap_set.maps.length < 15"
+                v-for="beatmap in this.taikoMaps"
+                :style="{ background: this.diffColor(beatmap.difficult) }"
+              ></div>
+              <span
+                v-if="this.beatmap_set.maps.length >= 15"
+                class="diff-count"
+              >
                 {{ this.taikoMaps.length }}
               </span>
-              </a-space>
-              <a-space align="center" v-if="this.catchMaps.length !== 0" :size="this.diffspace">
-                <img
-                    class="gamemode-icon"
-                    src="../assets/osu/mode-fruits-small.png"
-                />
-                <div
-                    class="diff"
-                    v-if="this.beatmap_set.maps.length < 15"
-                    v-for="beatmap in this.catchMaps"
-                    :style="{ background: this.diffColor(beatmap.difficult) }"
-                ></div>
-                <span v-if="this.beatmap_set.maps.length >= 15" class="diff-count">
+            </a-space>
+            <a-space
+              align="center"
+              v-if="this.catchMaps.length !== 0"
+              :size="this.diffspace"
+            >
+              <img
+                class="gamemode-icon"
+                src="../assets/osu/mode-fruits-small.png"
+              />
+              <div
+                class="diff"
+                v-if="this.beatmap_set.maps.length < 15"
+                v-for="beatmap in this.catchMaps"
+                :style="{ background: this.diffColor(beatmap.difficult) }"
+              ></div>
+              <span
+                v-if="this.beatmap_set.maps.length >= 15"
+                class="diff-count"
+              >
                 {{ this.catchMaps.length }}
               </span>
-              </a-space>
-              <a-space align="center" v-if="this.maniaMaps.length !== 0" :size="this.diffspace">
-                <img
-                    class="gamemode-icon"
-                    src="../assets/osu/mode-mania-small.png"
-                />
-                <div
-                    class="diff"
-                    v-if="this.beatmap_set.maps.length < 15"
-                    v-for="beatmap in this.maniaMaps"
-                    :style="{ background: this.diffColor(beatmap.difficult) }"
-                ></div>
-                <span v-if="this.beatmap_set.maps.length >= 15" class="diff-count">
+            </a-space>
+            <a-space
+              align="center"
+              v-if="this.maniaMaps.length !== 0"
+              :size="this.diffspace"
+            >
+              <img
+                class="gamemode-icon"
+                src="../assets/osu/mode-mania-small.png"
+              />
+              <div
+                class="diff"
+                v-if="this.beatmap_set.maps.length < 15"
+                v-for="beatmap in this.maniaMaps"
+                :style="{ background: this.diffColor(beatmap.difficult) }"
+              ></div>
+              <span
+                v-if="this.beatmap_set.maps.length >= 15"
+                class="diff-count"
+              >
                 {{ this.maniaMaps.length }}
               </span>
-              </a-space>
-            </div>
-          </a-space>
-        </a-popover>
-
+            </a-space>
+          </div>
+        </a-space>
       </div>
       <div class="menu">
         <div class="menu-inner">
           <a-tooltip title="收藏铺面">
             <font-awesome-icon
-                :icon="['far', 'heart']"
-                class="fa-icon"
+              :icon="['far', 'heart']"
+              class="fa-icon"
             ></font-awesome-icon>
           </a-tooltip>
           <a-tooltip title="下载">
             <a
-                :href="`https://dl.sayobot.cn/beatmaps/download/full/${this.beatmap_set.id}`"
+              :href="`https://dl.sayobot.cn/beatmaps/download/full/${this.beatmap_set.id}`"
             >
               <font-awesome-icon
-                  :icon="['fas', 'file-download']"
-                  class="fa-icon"
+                :icon="['fas', 'file-download']"
+                class="fa-icon"
               ></font-awesome-icon>
             </a>
           </a-tooltip>
         </div>
       </div>
     </div>
+    <el-collapse-transition>
+      <div
+        class="diff-details"
+        v-show="this.detailShow"
+        @mouseenter="this.mouseInDetailDiv = true"
+        @mouseleave="this.mouseInDetailDiv = false"
+      >
+        <div class="diff-details__inner">
+          <a-space
+            class="diff-detail"
+            :size="4"
+            align="baseline"
+            v-for="map in this.beatmap_set.maps"
+          >
+            <img class="gamemode-icon" :src="this.getModePic(map.mode)" />
+            <span
+              class="stars"
+              :style="{ background: this.diffColor(map.difficult) }"
+            >
+              <font-awesome-icon :icon="['fas', 'star']" />
+              {{ map.difficult.toFixed(2) }}
+            </span>
+            <span>{{ map.name }}</span>
+          </a-space>
+        </div>
+      </div>
+    </el-collapse-transition>
   </div>
-
 </template>
 
 <script lang="ts">
 import { PropType } from "vue";
 import { IBeatmapSet } from "@src/common/interfaces/osu";
-import { GameMode, Approved } from "@src/common/enums/osu"
-import { Modal } from 'ant-design-vue'
+import { GameMode, Approved } from "@src/common/enums/osu";
+import { Modal } from "ant-design-vue";
 
 export default {
   name: "SongCard",
@@ -161,7 +204,9 @@ export default {
       diffs: [0, 2.0, 2.7, 4.0, 5.3, 6.5],
       expertPurple: "#545ad6",
       diffspace: 1,
-      modalVisible: false
+      modalVisible: false,
+      mouseInDetailDiv: false,
+      mouseInDiffsDiv: false,
     };
   },
   methods: {
@@ -218,10 +263,10 @@ export default {
       return "";
     },
     gradientColor(
-        startColor: string,
-        endColor: string,
-        step: number,
-        index: number
+      startColor: string,
+      endColor: string,
+      step: number,
+      index: number
     ): string {
       let startRGB = this.HexToRgb(startColor); //转换为rgb数组模式
       let startR = startRGB[0];
@@ -237,7 +282,7 @@ export default {
       let sB = (endB - startB) / step;
 
       return this.RgbToHex(
-          "rgb(" +
+        "rgb(" +
           Math.round(sR * index + startR) +
           "," +
           Math.round(sG * index + startG) +
@@ -257,44 +302,41 @@ export default {
       const step = parseInt((this.diffs[index] - this.diffs[index - 1]) * 100);
       const i = parseInt((diff - this.diffs[index - 1]) * 100);
       return this.gradientColor(
-          this.colors[index - 1],
-          this.colors[index],
-          step,
-          i
+        this.colors[index - 1],
+        this.colors[index],
+        step,
+        i
       );
     },
     getModePic(mode: GameMode): string {
       switch (mode) {
         case GameMode.osu:
-          return '../assets/osu/mode-osu-small.png'
+          return "../assets/osu/mode-osu-small.png";
         case GameMode.taiko:
-          return '../assets/osu/mode-taiko-small.png'
+          return "../assets/osu/mode-taiko-small.png";
         case GameMode.catch:
-          return '../assets/osu/mode-fruits-small.png'
+          return "../assets/osu/mode-fruits-small.png";
         case GameMode.mania:
-          return '../assets/osu/mode-mania-small.png'
+          return "../assets/osu/mode-mania-small.png";
       }
-      return ''
+      return "";
     },
     handleOk(e) {
-      console.log(e)
-      this.modalVisible = false
+      console.log(e);
     },
     showModal() {
-      const modal = Modal.confirm(
-          {
-            title: 'This is a notification message',
-            content: `Test.`,
-            maskClosable: true,
-            centered: true,
-            onCancel: () => {
-              modal.destroy()
-            },
-            onOk: () => {
-              modal.destroy()
-            }
-          }
-      )
+      const modal = Modal.confirm({
+        title: "This is a notification message",
+        content: `Test.`,
+        maskClosable: true,
+        centered: true,
+        onCancel: () => {
+          modal.destroy();
+        },
+        onOk: () => {
+          modal.destroy();
+        },
+      });
     },
   },
   computed: {
@@ -305,16 +347,19 @@ export default {
       return Approved[this.beatmap_set.approved].toUpperCase();
     },
     osuMaps() {
-      return this.beatmap_set.maps.filter(v => v.mode == GameMode.osu);
+      return this.beatmap_set.maps.filter((v) => v.mode == GameMode.osu);
     },
     taikoMaps() {
-      return this.beatmap_set.maps.filter(v => v.mode == GameMode.taiko);
+      return this.beatmap_set.maps.filter((v) => v.mode == GameMode.taiko);
     },
     catchMaps() {
-      return this.beatmap_set.maps.filter(v => v.mode == GameMode.catch);
+      return this.beatmap_set.maps.filter((v) => v.mode == GameMode.catch);
     },
     maniaMaps() {
-      return this.beatmap_set.maps.filter(v => v.mode == GameMode.mania);
+      return this.beatmap_set.maps.filter((v) => v.mode == GameMode.mania);
+    },
+    detailShow() {
+      return this.mouseInDetailDiv || this.mouseInDiffsDiv;
     },
   },
 };
@@ -327,83 +372,6 @@ export default {
 // 去掉Modal自带的两个按钮
 .ant-modal-confirm-btns {
   display: none;
-}
-
-.diff-details {
-  display: flex;
-  flex-direction: column;
-  .diff-detail {
-    height: 15px;
-    font-size: 12px;
-    font-weight: 600;
-    align-items: center;
-    color: #fff;
-    margin: 1px;
-
-    .gamemode-icon {
-      width: 14px;
-      height: 14px;
-      margin-bottom: 2px;
-    }
-
-    .stars {
-      padding: 0 6px;
-      color: hsl(200, 10%, 10%);
-      border-radius: 15px;
-
-      .fa-star {
-        width: .9em;
-      }
-    }
-  }
-}
-
-
-
-// 去掉popover的箭头
-.beatmap-popover {
-  margin-top: 100px;
-  width: 100%;
-  left: 0 !important;
-  top: 0 !important;
-  z-index: 4;
-  font-family: Torus, sans-serif;
-  border-radius: 0 0 @song-card-radius @song-card-radius;
-  background-color: hsl(200, 10%, 30%);
-  padding-top: 0;
-
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    background-color: inherit;
-    top: -10px;
-    height: 10px;
-    width: 10px;
-  }
-
-  &::before {
-    left: 0;
-    clip-path: path("M0 0 L0 10 L10 10 A10 10 0 0 1 0 0 Z");
-  }
-
-  &::after {
-    right: 0;
-    clip-path: path("M10 0 A10 10 0 0 1 0 10 L10 10 L10 0 Z");
-  }
-
-  .ant-popover-inner {
-    border-radius: @song-card-radius;
-    box-shadow: none;
-
-    .ant-popover-inner-content {
-      padding: 6px 8px;
-    }
-  }
-
-  .ant-popover-arrow {
-    display: none;
-  }
 }
 
 .song-card {
@@ -507,9 +475,11 @@ export default {
       text-align: start;
       justify-content: space-between;
       padding: 4px 10px 6px;
-      background: linear-gradient(0.25turn,
-      hsl(200, 10%, 20%),
-      hsla(200, 10%, 20%, 0.8));
+      background: linear-gradient(
+        0.25turn,
+        hsl(200, 10%, 20%),
+        hsla(200, 10%, 20%, 0.8)
+      );
       border-radius: 9px 0 0 9px;
       white-space: nowrap;
       width: calc(100% - 120px - 10px);
@@ -524,7 +494,6 @@ export default {
       .song-title {
         font-size: 16px;
         text-shadow: 0 1px 3px rgb(0 0 0 / 75%);
-
       }
 
       .song-artist {
@@ -660,7 +629,70 @@ export default {
     }
   }
 
+  .diff-details {
+    position: absolute;
+    top: 0;
+    margin-top: 90px;
+    left: 0;
+    width: 100%;
+    z-index: 4;
+
+    .diff-details__inner {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+      padding: 10px 5px;
+      border-radius: 0 0 @song-card-radius @song-card-radius;
+      background-color: hsl(200, 10%, 30%);
+      overflow: visible;
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        background-color: inherit;
+        top: 0px;
+        height: 10px;
+        width: 10px;
+      }
+
+      &::before {
+        left: 0;
+        clip-path: path("M0 0 L0 10 L10 10 A10 10 0 0 1 0 0 Z");
+      }
+
+      &::after {
+        right: 0;
+        clip-path: path("M10 0 A10 10 0 0 1 0 10 L10 10 L10 0 Z");
+      }
+      .diff-detail {
+        height: 15px;
+        font-size: 12px;
+        font-weight: 600;
+        align-items: center;
+        color: #fff;
+        margin: 1px;
+
+        .gamemode-icon {
+          width: 14px;
+          height: 14px;
+          margin-bottom: 2px;
+        }
+
+        .stars {
+          padding: 0 6px;
+          color: hsl(200, 10%, 10%);
+          border-radius: 15px;
+
+          .fa-star {
+            width: 0.9em;
+          }
+        }
+      }
+    }
+  }
+
   &:hover {
+    z-index: 6;
     .menu {
       width: 30px;
 

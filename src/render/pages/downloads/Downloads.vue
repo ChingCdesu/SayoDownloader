@@ -2,7 +2,6 @@
   <div class="download-page">
     <a-page-header title="下载列表"/>
     <a-list itemLayout="horizontal" :split="false" :dataSource="this.dh" class="download-items">
-
       <template #renderItem="{ item }">
         <a-list-item key="item.id"
                      class="download-item"
