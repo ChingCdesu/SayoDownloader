@@ -1,5 +1,5 @@
-import {IBeatmapSet, IBeatmap} from '@src/common/interfaces/osu'
-import {IApiBeatmapSet} from '@src/common/interfaces/api.osu'
+import { IBeatmapSet, IBeatmap } from '@src/common/interfaces/osu'
+import { IApiBeatmapSet } from '@src/common/interfaces/api.osu'
 
 export const apiData2IBeatmapSet = (data: IApiBeatmapSet): IBeatmapSet => {
     let ret: IBeatmapSet = {
@@ -18,7 +18,11 @@ export const apiData2IBeatmapSet = (data: IApiBeatmapSet): IBeatmapSet => {
         bpm: data.bpm,
         maps: []
     }
-    data.bid_data.sort((a, b) => a.star - b.star)
+    data.bid_data.sort((a, b) => {
+        if (a.mode == b.mode)
+            return a.star - b.star
+        return a.mode - b.mode
+    })
     for (var i = 0; i < data.bid_data.length; ++i) {
         const beatmap = data.bid_data[i]
         ret.maps.push({

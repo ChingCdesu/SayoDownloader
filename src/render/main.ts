@@ -3,7 +3,7 @@ import App from './App'
 import router from './router'
 import Antd from 'ant-design-vue'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faFileDownload, faPlay, faRedo, faPause } from '@fortawesome/free-solid-svg-icons'
+import { faFileDownload, faPlay, faRedo, faPause, faStar } from '@fortawesome/free-solid-svg-icons'
 import { faHeart, faFileArchive, faFolderOpen, faFile } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -16,7 +16,7 @@ import '@/assets/style/boot4-part.less'
 import '@/assets/fonts/torus/torus.less'
 import './index.less'
 
-library.add(faFileDownload, faHeart, faPlay, faFileArchive, faRedo, faFolderOpen, faPause, faFile)
+library.add(faFileDownload, faHeart, faPlay, faFileArchive, faRedo, faFolderOpen, faPause, faFile, faStar)
 
 
 createApp(App)

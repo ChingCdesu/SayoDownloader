@@ -425,6 +425,14 @@
     is-module "^1.0.0"
     resolve "^1.19.0"
 
+"@rollup/plugin-typescript@^8.2.1":
+  version "8.2.1"
+  resolved "https://registry.npm.taobao.org/@rollup/plugin-typescript/download/@rollup/plugin-typescript-8.2.1.tgz#f1a32d4030cc83432ce36a80a922280f0f0b5d44"
+  integrity sha1-8aMtQDDMg0Ms42qAqSIoDw8LXUQ=
+  dependencies:
+    "@rollup/pluginutils" "^3.1.0"
+    resolve "^1.17.0"
+
 "@rollup/pluginutils@^3.0.8", "@rollup/pluginutils@^3.1.0":
   version "3.1.0"
   resolved "https://registry.npm.taobao.org/@rollup/pluginutils/download/@rollup/pluginutils-3.1.0.tgz?cache=0&sync_timestamp=1603765619888&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40rollup%2Fpluginutils%2Fdownload%2F%40rollup%2Fpluginutils-3.1.0.tgz#706b4524ee6dc8b103b3c995533e5ad680c02b9b"
@@ -549,9 +557,9 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@vitejs/plugin-vue-jsx@^1.1.0":
+"@vitejs/plugin-vue-jsx@^1.1.4":
   version "1.1.4"
-  resolved "https://registry.nlark.com/@vitejs/plugin-vue-jsx/download/@vitejs/plugin-vue-jsx-1.1.4.tgz#3af194202f9ed38a7384f7a7c72f5b66ce863859"
+  resolved "https://registry.nlark.com/@vitejs/plugin-vue-jsx/download/@vitejs/plugin-vue-jsx-1.1.4.tgz?cache=0&sync_timestamp=1620029113602&other_urls=https%3A%2F%2Fregistry.nlark.com%2F%40vitejs%2Fplugin-vue-jsx%2Fdownload%2F%40vitejs%2Fplugin-vue-jsx-1.1.4.tgz#3af194202f9ed38a7384f7a7c72f5b66ce863859"
   integrity sha1-OvGUIC+e04pzhPenxy9bZs6GOFk=
   dependencies:
     "@babel/core" "^7.12.10"
@@ -663,6 +671,11 @@
   version "3.0.11"
   resolved "https://registry.nlark.com/@vue/shared/download/@vue/shared-3.0.11.tgz#20d22dd0da7d358bb21c17f9bde8628152642c77"
   integrity sha1-INIt0Np9NYuyHBf5vehigVJkLHc=
+
+acorn@^8.2.4:
+  version "8.2.4"
+  resolved "https://registry.nlark.com/acorn/download/acorn-8.2.4.tgz?cache=0&sync_timestamp=1620134156200&other_urls=https%3A%2F%2Fregistry.nlark.com%2Facorn%2Fdownload%2Facorn-8.2.4.tgz#caba24b08185c3b56e3168e97d15ed17f4d31fd0"
+  integrity sha1-yroksIGFw7VuMWjpfRXtF/TTH9A=
 
 ajv-formats@^1.5.1:
   version "1.6.1"
@@ -1536,10 +1549,10 @@ electron-to-chromium@^1.3.723:
   resolved "https://registry.nlark.com/electron-to-chromium/download/electron-to-chromium-1.3.727.tgz#857e310ca00f0b75da4e1db6ff0e073cc4a91ddf"
   integrity sha1-hX4xDKAPC3XaTh22/w4HPMSpHd8=
 
-electron@12.0.1:
-  version "12.0.1"
-  resolved "https://registry.nlark.com/electron/download/electron-12.0.1.tgz#11afa81dae858cc7cd79107c2f789e8a7f93a31b"
-  integrity sha1-Ea+oHa6FjMfNeRB8L3iein+Toxs=
+electron@12.0.2:
+  version "12.0.2"
+  resolved "https://registry.nlark.com/electron/download/electron-12.0.2.tgz#d92be205f1937627bd6718aad44ac161382b4c2d"
+  integrity sha1-2SviBfGTdie9Zxiq1ErBYTgrTC0=
   dependencies:
     "@electron/get" "^1.0.1"
     "@types/node" "^14.6.2"

@@ -1,5 +1,5 @@
-import Store = require('electron-store')
-import electron = require('electron')
+import Store from 'electron-store'
+import { app } from 'electron'
 
 export default new Store({
     name: 'store',
@@ -10,7 +10,7 @@ export default new Store({
         }
     },
     defaults: {
-        defaultDownloadPath: electron.app.getPath('downloads'),
+        defaultDownloadPath: app?.getPath('downloads'),
         displayWithUnicode: false
     },
     schema: {
@@ -20,6 +20,5 @@ export default new Store({
         displayWithUnicode: {
             type: 'boolean'
         },
-
     }
 })

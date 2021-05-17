@@ -1,11 +1,12 @@
-import Electron = require('electron')
+import { IpcRendererEvent, ipcRenderer } from 'electron'
 
 import {
-  IDownloadFile,
-  INewDownloadFile,
-  IPagination,
-  IPCEventName,
+    IDownloadFile,
+    INewDownloadFile,
+    IPagination,
+    IPCEventName,
 } from '@src/common/interfaces/download'
+import * as electron from 'electron';
 
 /**
  * 添加 ipc 调用监听事件
@@ -13,12 +14,12 @@ import {
  * @param callback - 回调函数
  */
 export const ipcRendererListener = (
-  eventName: IPCEventName,
-  callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void,
+    eventName: IPCEventName,
+    callback: (event: IpcRendererEvent, ...args: any[]) => void,
 ): void => {
-  Electron.ipcRenderer.on(eventName, (event, ...args: any[]) => {
-    callback(event, ...args)
-  })
+    ipcRenderer.on(eventName, (event, ...args: any[]) => {
+        callback(event, ...args)
+    })
 }
 
 /**
@@ -28,7 +29,7 @@ export const ipcRendererListener = (
  * @returns `Promise<any>`
  */
 export const ipcRendererInvoke = <T>(eventName: IPCEventName, ...args: any[]): Promise<T> =>
-Electron.ipcRenderer.invoke(eventName, ...args)
+    ipcRenderer.invoke(eventName, ...args)
 
 /**
  * 打开文件
@@ -40,7 +41,7 @@ export const openFile = (path: string): Promise<string> => ipcRendererInvoke('op
  * 打开下载管理器
  */
 export const openDownloadManager = (): void => {
-  ipcRendererInvoke('openDownloadManager', '/download-manager/demo')
+    ipcRendererInvoke('openDownloadManager', '/download-manager/demo')
 }
 
 /**
@@ -48,41 +49,41 @@ export const openDownloadManager = (): void => {
  * @param formData - 下载数据
  */
 export const newDownloadFile = (formData: INewDownloadFile): Promise<IDownloadFile | null> =>
-  ipcRendererInvoke<IDownloadFile | null>('newDownloadFile', formData)
+    ipcRendererInvoke<IDownloadFile | null>('newDownloadFile', formData)
 
 /**
  * 重新下载
  */
 export const retryDownloadFile = (item: IDownloadFile): Promise<boolean> =>
-  ipcRendererInvoke<boolean>('retryDownloadFile', item)
+    ipcRendererInvoke<boolean>('retryDownloadFile', item)
 
 /**
  * 打开选择保存位置对话框
  * @param path - 路径
  */
 export const openFileDialog = (path: string): Promise<string> =>
-  ipcRendererInvoke<string>('openFileDialog', path)
+    ipcRendererInvoke<string>('openFileDialog', path)
 
 /**
  * 暂停或恢复下载
  * @param item - 下载项
  */
 export const pauseOrResume = (item: IDownloadFile): Promise<IDownloadFile> =>
-  ipcRendererInvoke<IDownloadFile>('pauseOrResume', item)
+    ipcRendererInvoke<IDownloadFile>('pauseOrResume', item)
 
 /**
  * 打开文件所在位置
  * @param path - 路径
  */
 export const openFileInFolder = (path: string): Promise<boolean> =>
-  ipcRendererInvoke<boolean>('openFileInFolder', path)
+    ipcRendererInvoke<boolean>('openFileInFolder', path)
 
 /**
  * 获取下载数据
  * @param page - 分页
  */
 export const getDownloadData = (page: IPagination): Promise<IDownloadFile[]> =>
-  ipcRendererInvoke('getDownloadData', page)
+    ipcRendererInvoke('getDownloadData', page)
 
 /**
  * 删除下载项。下载中的将先取消，再删除
@@ -90,19 +91,19 @@ export const getDownloadData = (page: IPagination): Promise<IDownloadFile[]> =>
  * @param index - 下载项的下标
  */
 export const removeDownloadItem = (item: IDownloadFile, index: number): Promise<IDownloadFile> =>
-  ipcRendererInvoke<IDownloadFile>('removeDownloadItem', item, index)
+    ipcRendererInvoke<IDownloadFile>('removeDownloadItem', item, index)
 
 /**
  * 清空下载完成项
  */
 export const clearDownloadDone = (): Promise<IDownloadFile[]> =>
-  ipcRendererInvoke('clearDownloadDone')
+    ipcRendererInvoke('clearDownloadDone')
 
 /**
  * 获取下载路径
  */
 export const getDownloadPath = (): Promise<string> =>
-  ipcRendererInvoke('getDownloadPath')
+    ipcRendererInvoke('getDownloadPath')
 
 export const getDownloadItemCount = (): Promise<number> =>
     ipcRendererInvoke('getDownloadItemCount')
@@ -112,7 +113,7 @@ export const getDownloadItemCount = (): Promise<number> =>
  * @param callback - 回调函数
  */
 export const listenerNewDownloadItem = (
-  callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void,
+    callback: (event: IpcRendererEvent, ...args: any[]) => void,
 ): void => ipcRendererListener('newDownloadItem', callback)
 
 /**
@@ -120,7 +121,7 @@ export const listenerNewDownloadItem = (
  * @param callback - 回调函数
  */
 export const listenerDownloadItemUpdate = (
-  callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void,
+    callback: (event: IpcRendererEvent, ...args: any[]) => void,
 ): void => ipcRendererListener('downloadItemUpdate', callback)
 
 /**
@@ -128,5 +129,5 @@ export const listenerDownloadItemUpdate = (
  * @param callback - 回调函数
  */
 export const listenerDownloadItemDone = (
-  callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void,
+    callback: (event: IpcRendererEvent, ...args: any[]) => void,
 ): void => ipcRendererListener('downloadItemDone', callback)
