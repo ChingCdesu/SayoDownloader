@@ -26,7 +26,7 @@
         <span class="song-creator info-text"
           >作图者: {{ this.beatmap_set.creator }}</span
         >
-        <a-space
+        <el-space
           class="song-maps-inner"
           @mouseleave="this.mouseInDiffsDiv = false"
           @mouseenter="this.mouseInDiffsDiv = true"
@@ -35,7 +35,7 @@
             {{ this.approved }}
           </div>
           <div class="diffs">
-            <a-space
+            <el-space
               align="center"
               v-if="this.osuMaps.length !== 0"
               :size="this.diffspace"
@@ -56,8 +56,8 @@
               >
                 {{ this.osuMaps.length }}
               </span>
-            </a-space>
-            <a-space
+            </el-space>
+            <el-space
               align="center"
               v-if="this.taikoMaps.length !== 0"
               :size="this.diffspace"
@@ -78,8 +78,8 @@
               >
                 {{ this.taikoMaps.length }}
               </span>
-            </a-space>
-            <a-space
+            </el-space>
+            <el-space
               align="center"
               v-if="this.catchMaps.length !== 0"
               :size="this.diffspace"
@@ -100,8 +100,8 @@
               >
                 {{ this.catchMaps.length }}
               </span>
-            </a-space>
-            <a-space
+            </el-space>
+            <el-space
               align="center"
               v-if="this.maniaMaps.length !== 0"
               :size="this.diffspace"
@@ -122,9 +122,9 @@
               >
                 {{ this.maniaMaps.length }}
               </span>
-            </a-space>
+            </el-space>
           </div>
-        </a-space>
+        </el-space>
       </div>
       <div class="menu">
         <div class="menu-inner">
@@ -155,7 +155,7 @@
         @mouseleave="this.mouseInDetailDiv = false"
       >
         <div class="diff-details__inner">
-          <a-space
+          <el-space
             class="diff-detail"
             :size="4"
             align="baseline"
@@ -170,7 +170,7 @@
               {{ map.difficult.toFixed(2) }}
             </span>
             <span>{{ map.name }}</span>
-          </a-space>
+          </el-space>
         </div>
       </div>
     </el-collapse-transition>
@@ -375,7 +375,7 @@ export default {
 }
 
 .song-card {
-  max-width: 475px;
+  max-width: 496px;
   height: 100px;
   border-radius: @song-card-radius;
   overflow: visible;
@@ -643,26 +643,27 @@ export default {
       margin-top: 10px;
       padding: 10px 5px;
       border-radius: 0 0 @song-card-radius @song-card-radius;
-      background-color: hsl(200, 10%, 30%);
+      background-color: hsla(200, 10%, 30%, .7);
+      backdrop-filter: blur(5px);
       overflow: visible;
       &::before,
       &::after {
         content: "";
         position: absolute;
         background-color: inherit;
-        top: 0px;
+        top: -10px;
         height: 10px;
         width: 10px;
       }
 
       &::before {
         left: 0;
-        clip-path: path("M0 0 L0 10 L10 10 A10 10 0 0 1 0 0 Z");
+        clip-path: path("M0 0 L0 11 L10 11 L10 10 A10 10 0 0 1 0 0 Z");
       }
 
       &::after {
         right: 0;
-        clip-path: path("M10 0 A10 10 0 0 1 0 10 L10 10 L10 0 Z");
+        clip-path: path("M10 0 A10 10 0 0 1 0 10 L0 11 L10 11 L10 0 Z");
       }
       .diff-detail {
         height: 15px;

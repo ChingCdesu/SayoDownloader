@@ -1,6 +1,6 @@
 import { defineComponent } from 'vue'
 import { Layout } from 'ant-design-vue'
-import { ElContainer, ElMain, ElAside } from 'element-plus'
+import { ElContainer, ElMain, ElAside, ElBacktop } from 'element-plus'
 import Slider from './slider'
 import './index.less'
 
@@ -9,6 +9,7 @@ export default defineComponent({
   setup(_, ctx) {
     return () => (
       <ElContainer class='app-layout h-100'>
+        <ElBacktop target=".el-main" style="z-index: 9999; color: hsl(200, 100%, 60%);"></ElBacktop>
         <ElAside width="52px">
           <Slider />
         </ElAside>

@@ -15,7 +15,7 @@
           class="filter-search-input"
           suffix-icon="el-icon-search"
           placeholder="搜索关键字..."
-          v-model="this.filter.keyword"
+          v-model="this.keyword"
           @change="this.onSearch"
         />
       </div>
@@ -80,19 +80,36 @@
         </tbody>
       </table>
     </div>
-    <div class="beatmapsets" v-infinite-scroll="this.loadMore">
-      <a-row
-        :gutter="[16, 16]"
+    <div
+      class="beatmapsets"
+      v-infinite-scroll="this.loadMore"
+      :infinite-scroll-disabled="!this.autoload"
+      :infinite-scroll-immediate="false"
+    >
+      <el-row
         v-for="index in parseInt(this.sets.length / 2)"
         style="width: 100%"
+        class="sets-row"
       >
-        <a-col :span="12">
+        <el-col
+          :xs="{ span: 11, offset: 0 }"
+          :sm="{ span: 11, offset: 0 }"
+          :md="{ span: 10, offset: 2 }"
+          class="sets-item"
+          style="margin-right: 8px"
+        >
           <SongCard :beatmap_set="this.sets[(index - 1) * 2]" />
-        </a-col>
-        <a-col :span="12">
+        </el-col>
+        <el-col
+          :xs="{ span: 11, offset: 0 }"
+          :sm="{ span: 11, offset: 0 }"
+          :md="{ span: 10, offset: 2 }"
+          class="sets-item"
+          style="margin-left: 8px"
+        >
           <SongCard :beatmap_set="this.sets[(index - 1) * 2 + 1]" />
-        </a-col>
-      </a-row>
+        </el-col>
+      </el-row>
     </div>
   </div>
 </template>
@@ -102,8 +119,11 @@ import { IBeatmapSet } from "@src/common/interfaces/osu";
 import SongCard from "@/components/SongCard.vue";
 import { apiData2IBeatmapSet } from "@src/common/utils/data-trans";
 import Api from "@src/common/utils/api";
-import { onMounted, Ref, ref } from "vue";
+import { reactive, Ref, ref, watch } from "vue";
 import { IApiBeatmapSet } from "@src/common/interfaces/api.osu";
+import { cloneDeep } from "lodash";
+
+type number_array_of_2 = [number, number];
 
 interface IBeatmapListParams {
   cmd: string;
@@ -125,10 +145,7 @@ interface IBeatmapListParams {
   length?: number_array_of_2;
 }
 
-type number_array_of_2 = [number, number];
-
 interface IBeatmapFilter {
-  keyword?: string;
   mode?: number[];
   approved?: number[];
   genre?: number[];
@@ -147,14 +164,97 @@ export default {
   components: { SongCard },
   setup() {
     let sets: Ref<IBeatmapSet[]> = ref([]);
-    let error: Ref<boolean> = ref(false);
-    onMounted(async () => {
-      const result = await Api.post("/?post", {
+    let error = ref(false);
+    let autoload = ref(false);
+    let keyword = ref("");
+    var filter: IBeatmapFilter = reactive({
+      mode: [],
+      approved: [],
+      language: [],
+      genre: [],
+      stars: [0, 0],
+      cs: [0, 0],
+      ar: [0, 0],
+      od: [0, 0],
+      hp: [0, 0],
+      bpm: [0, 0],
+      length: [0, 0],
+    });
+    const limit = ref(25);
+    let page = ref(0);
+    const isFilterArrayEmpty = (arr: any[] | undefined): boolean => {
+      return arr?.length === 0;
+    };
+    const isFilterArray2Empty = (
+      arr: [number, number] | undefined
+    ): boolean => {
+      return arr?.reduce((p, v) => (p += v), 0) === 0;
+    };
+    const isFilterEmpty = (): boolean => {
+      let result = true;
+      result &&= filter.mode?.length === 0;
+      result &&= filter.approved?.length === 0;
+      result &&= filter.language?.length === 0;
+      result &&= filter.genre?.length === 0;
+      result &&= filter.stars?.reduce((p, v) => (p += v), 0) === 0;
+      result &&= filter.cs?.reduce((p, v) => (p += v), 0) === 0;
+      result &&= filter.ar?.reduce((p, v) => (p += v), 0) === 0;
+      result &&= filter.od?.reduce((p, v) => (p += v), 0) === 0;
+      result &&= filter.hp?.reduce((p, v) => (p += v), 0) === 0;
+      result &&= filter.length?.reduce((p, v) => (p += v), 0) === 0;
+      result &&= filter.bpm?.reduce((p, v) => (p += v), 0) === 0;
+      return result;
+    };
+    const onSearch = () => {
+      page.value = 0;
+      sets.value = [];
+      // 等第一页加载结束才启用自动滚动加载
+      autoload.value = false;
+      loadMore();
+      autoload.value = true;
+    };
+    const combineFilterObj = (): IBeatmapListParams => {
+      let obj: IBeatmapListParams = {
         cmd: "beatmaplist",
-        type: "hot",
-        limit: 20,
-      });
-      if (!result || result.status !== 200) {
+        limit: limit.value,
+        offset: limit.value * (page.value - 1),
+        type: isFilterEmpty() ? "hot" : "search",
+      };
+      if (keyword.value && keyword.value?.trim().length !== 0)
+        obj.keyword = keyword.value?.trim();
+      if (!isFilterArrayEmpty(filter.mode))
+        obj.mode = filter.mode?.reduce(
+          (sum: number, num: number) => (sum += num),
+          0
+        );
+      if (!isFilterArrayEmpty(filter.approved))
+        obj.class = filter.approved?.reduce(
+          (sum: number, num: number) => (sum += num),
+          0
+        );
+      if (!isFilterArrayEmpty(filter.genre))
+        obj.genre = filter.genre?.reduce(
+          (sum: number, num: number) => (sum += num),
+          0
+        );
+      if (!isFilterArrayEmpty(filter.language))
+        obj.language = filter.language?.reduce(
+          (sum: number, num: number) => (sum += num),
+          0
+        );
+      if (!isFilterArray2Empty(filter.stars)) obj.stars = filter.stars;
+      if (!isFilterArray2Empty(filter.ar)) obj.ar = filter.ar;
+      if (!isFilterArray2Empty(filter.cs)) obj.cs = filter.cs;
+      if (!isFilterArray2Empty(filter.hp)) obj.hp = filter.hp;
+      if (!isFilterArray2Empty(filter.od)) obj.od = filter.od;
+      if (!isFilterArray2Empty(filter.bpm)) obj.bpm = filter.bpm;
+      if (!isFilterArray2Empty(filter.length)) obj.length = filter.length;
+      return obj;
+    };
+    const loadMore = async () => {
+      page.value++;
+      const result = await Api.post("/?post", combineFilterObj());
+      if (!result || result.status !== 200 || result.data.status !== 0) {
         error.value = true;
         return;
       }
@@ -168,19 +268,18 @@ export default {
         const beatmapset = info.data.data as IApiBeatmapSet;
         sets.value.push(apiData2IBeatmapSet(beatmapset));
       }
-    });
-    return { sets, error };
+    };
+    loadMore().then(() => (autoload.value = true));
+    watch(
+      () => cloneDeep(filter),
+      (filter, _) => {
+        onSearch();
+      }
+    );
+
+    return { sets, error, filter, onSearch, loadMore, keyword, autoload };
   },
   data() {
-    var filter: IBeatmapFilter = {
-      mode: [],
-      approved: [],
-      language: [],
-      genre: [],
-      keyword: "",
-    };
-    const limit: number = 25;
-    let page = 1;
     const modeOptions = [
       { label: "std", value: 1 },
       { label: "taiko", value: 2 },
@@ -222,76 +321,12 @@ export default {
     ];
     const filterBtnClass = "filter-checkbox-btn";
     return {
-      filter,
       filterBtnClass,
-      limit,
-      page,
       modeOptions,
       approvedOptions,
       genreOptions,
       languageOptions,
     };
-  },
-  methods: {
-    onSearch() {
-      console.log(this.combineFilterObj());
-    },
-    combineFilterObj(): IBeatmapListParams {
-      let obj: IBeatmapListParams = {
-        cmd: "beatmaplist",
-        limit: this.limit,
-        offset: this.limit * (this.page - 1),
-        type: this.filter.keyword?.length ? "search" : "hot",
-      };
-      if (this.filter.keyword && this.filter.keyword?.trim().length !== 0)
-        obj.keyword = this.filter.keyword?.trim();
-      if (this.filter.mode?.length)
-        obj.mode = this.filter.mode?.reduce(
-          (sum: number, num: number) => (sum += num),
-          0
-        );
-      if (this.filter.approved?.length)
-        obj.class = this.filter.approved?.reduce(
-          (sum: number, num: number) => (sum += num),
-          0
-        );
-      if (this.filter.genre?.length)
-        obj.genre = this.filter.genre?.reduce(
-          (sum: number, num: number) => (sum += num),
-          0
-        );
-      if (this.filter.language?.length)
-        obj.language = this.filter.language?.reduce(
-          (sum: number, num: number) => (sum += num),
-          0
-        );
-      if (this.filter.stars) obj.stars = this.filter.stars;
-      if (this.filter.ar) obj.ar = this.filter.ar;
-      if (this.filter.cs) obj.cs = this.filter.cs;
-      if (this.filter.hp) obj.hp = this.filter.hp;
-      if (this.filter.od) obj.od = this.filter.od;
-      if (this.filter.bpm) obj.bpm = this.filter.bpm;
-      if (this.filter.length) obj.length = this.filter.length;
-      return obj;
-    },
-    async loadMore() {
-      this.page++
-      const result = await Api.post('/?post', this.combineFilterObj())
-      if (!result || result.status !== 200) {
-        this.error = true;
-        return;
-      }
-      for (var i = 0; i < result.data.data.length; ++i) {
-        const sid = result.data.data[i].sid;
-        const info = await Api.get(`/v2/beatmapinfo?K=${sid}`);
-        if (!info || result.status !== 200) {
-          this.error = true;
-          return;
-        }
-        const beatmapset = info.data.data as IApiBeatmapSet;
-        this.sets.push(apiData2IBeatmapSet(beatmapset));
-      }
-    }
   },
 };
 </script>
@@ -325,20 +360,12 @@ export default {
         background-color: hsl(200, 10%, 30%);
         border: 1px solid hsl(200, 10%, 20%);
         color: #fff;
-        transition: all cubic-bezier(.645,.045,.355,1) .2s;
+        transition: all cubic-bezier(0.645, 0.045, 0.355, 1) 0.2s;
         &:focus,
         &:hover {
           border: 1px solid hsl(200, 40%, 80%);
           box-shadow: 0 0 10px hsl(200, 40%, 80%);
         }
-      }
-
-      .ant-input-search-icon {
-        color: rgba(255, 255, 255, 0.45);
-      }
-
-      .ant-input {
-        background-color: hsl(200, 10%, 30%);
       }
     }
 
@@ -362,12 +389,10 @@ export default {
             }
             .el-checkbox-button__inner {
               background: hsl(200, 100%, 60%);
-              // background: rgb(118,126,136);
               border-color: hsl(200, 100%, 60%);
             }
           }
           .el-checkbox-button__inner {
-            // background: hsla(200, 50%, 45%, 0.7);
             background: rgba(73, 83, 96, 0.7);
             color: hsl(200, 40%, 100%);
           }
@@ -383,6 +408,9 @@ export default {
   .beatmapsets {
     width: 100%;
     min-height: calc(100vh - 500);
+    .sets-row {
+      margin-bottom: 16px;
+    }
   }
 }
 </style>
