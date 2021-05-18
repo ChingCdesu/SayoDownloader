@@ -16,7 +16,7 @@ class ApiService {
     private _instance: AxiosInstance
 
     public get = (url: string, config?: AxiosRequestConfig) => this._instance.get(url, config)
-    public post = (url: string, config?: AxiosRequestConfig) => this._instance.post(url, config)
+    public post = (url: string, data?: any, config?: AxiosRequestConfig) => this._instance.post(url, data, config)
 
     public static get instance() {
         if (!this.singleton) {

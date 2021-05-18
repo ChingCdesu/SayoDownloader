@@ -8,7 +8,7 @@ export function getLoadURL() {
 }
 
 export const options: Electron.BrowserWindowConstructorOptions = {
-  width: 1024,
+  width: 1080,
   height: 768,
   webPreferences: {
     nodeIntegration: true,

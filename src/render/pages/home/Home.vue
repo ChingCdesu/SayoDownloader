@@ -27,6 +27,7 @@
               <el-checkbox-group v-model="this.filter.mode" size="mini">
                 <el-checkbox-button
                   v-for="option in this.modeOptions"
+                  :key="option"
                   :label="option.value"
                   :class="this.filterBtnClass"
                 >
@@ -41,6 +42,7 @@
               <el-checkbox-group v-model="this.filter.approved" size="mini">
                 <el-checkbox-button
                   v-for="option in this.approvedOptions"
+                  :key="option"
                   :label="option.value"
                   :class="this.filterBtnClass"
                 >
@@ -55,6 +57,7 @@
               <el-checkbox-group v-model="this.filter.genre" size="mini">
                 <el-checkbox-button
                   v-for="option in this.genreOptions"
+                  :key="option"
                   :label="option.value"
                   :class="this.filterBtnClass"
                 >
@@ -69,6 +72,7 @@
               <el-checkbox-group v-model="this.filter.language" size="mini">
                 <el-checkbox-button
                   v-for="option in this.languageOptions"
+                  :key="option"
                   :label="option.value"
                   :class="this.filterBtnClass"
                 >
@@ -88,6 +92,7 @@
     >
       <el-row
         v-for="index in parseInt(this.sets.length / 2)"
+        :key="index"
         style="width: 100%"
         class="sets-row"
       >
@@ -112,11 +117,14 @@
       </el-row>
     </div>
   </div>
+  <Player  />
 </template>
 
 <script lang="ts">
 import { IBeatmapSet } from "@src/common/interfaces/osu";
 import SongCard from "@/components/SongCard.vue";
+import PlayerSingleton from "@src/common/utils/player";
+import Player from "@/components/Player.vue";
 import { apiData2IBeatmapSet } from "@src/common/utils/data-trans";
 import Api from "@src/common/utils/api";
 import { reactive, Ref, ref, watch } from "vue";
@@ -161,7 +169,7 @@ interface IBeatmapFilter {
 
 export default {
   name: "home",
-  components: { SongCard },
+  components: { SongCard, Player },
   setup() {
     let sets: Ref<IBeatmapSet[]> = ref([]);
     let error = ref(false);
@@ -320,12 +328,14 @@ export default {
       { label: "意大利语", value: 2048 },
     ];
     const filterBtnClass = "filter-checkbox-btn";
+    const player = PlayerSingleton.instance
     return {
       filterBtnClass,
       modeOptions,
       approvedOptions,
       genreOptions,
       languageOptions,
+      player
     };
   },
 };

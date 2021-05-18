@@ -32,5 +32,6 @@ export interface IBeatmapSet {
     genre: Genre,
     duration: Number,
     bpm: Number,
-    maps: IBeatmap[]
+    maps: IBeatmap[],
+    audio?: string
 }

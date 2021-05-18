@@ -505,6 +505,11 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
+"@types/howler@^2.2.2":
+  version "2.2.2"
+  resolved "https://registry.nlark.com/@types/howler/download/@types/howler-2.2.2.tgz#54f621983c3635e2e071a95644ba28eea84814c2"
+  integrity sha1-VPYhmDw2NeLgcalWRLoo7qhIFMI=
+
 "@types/lodash@^4.14.161", "@types/lodash@^4.14.165":
   version "4.14.169"
   resolved "https://registry.nlark.com/@types/lodash/download/@types/lodash-4.14.169.tgz#83c217688f07a4d9ef8f28a3ebd1d318f6ff4cbb"
@@ -1920,6 +1925,11 @@ hosted-git-info@^4.0.2:
   integrity sha1-XkJVB+7eT+qEa3Ji8IOEVsQgmWE=
   dependencies:
     lru-cache "^6.0.0"
+
+howler@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.npm.taobao.org/howler/download/howler-2.2.1.tgz#a521a9b495841e8bb9aa12e651bebba0affc179e"
+  integrity sha1-pSGptJWEHou5qhLmUb67oK/8F54=
 
 html-tags@^3.1.0:
   version "3.1.0"

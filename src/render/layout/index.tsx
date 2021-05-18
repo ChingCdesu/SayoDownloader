@@ -9,7 +9,7 @@ export default defineComponent({
   setup(_, ctx) {
     return () => (
       <ElContainer class='app-layout h-100'>
-        <ElBacktop target=".el-main" style="z-index: 9999; color: hsl(200, 100%, 60%);"></ElBacktop>
+        <ElBacktop target=".el-main" style="z-index: 100; color: hsl(200, 100%, 60%);" bottom="70" right="20"></ElBacktop>
         <ElAside width="52px">
           <Slider />
         </ElAside>

@@ -15,13 +15,13 @@
       </div>
     </div>
     <div class="content">
-      <div class="play">
+      <div class="play" @click="this.addSongAndPlay">
         <font-awesome-icon :icon="['fas', 'play']" />
       </div>
       <div class="info" @click="showModal">
-        <span class="song-title info-text">{{ this.beatmap_set.title }}</span>
+        <span class="song-title info-text">{{ this.displayTitle }}</span>
         <span class="song-artist info-text"
-          >作曲/歌手: {{ this.beatmap_set.artist }}</span
+          >作曲/歌手: {{ this.displayArtist }}</span
         >
         <span class="song-creator info-text"
           >作图者: {{ this.beatmap_set.creator }}</span
@@ -35,95 +35,33 @@
             {{ this.approved }}
           </div>
           <div class="diffs">
-            <el-space
-              align="center"
-              v-if="this.osuMaps.length !== 0"
-              :size="this.diffspace"
-            >
-              <img
-                class="gamemode-icon"
-                src="../assets/osu/mode-osu-small.png"
-              />
-              <div
-                class="diff"
-                v-if="this.beatmap_set.maps.length < 15"
-                v-for="beatmap in this.osuMaps"
-                :key="beatmap.id"
-                :style="{ background: this.diffColor(beatmap.difficult) }"
-              ></div>
-              <span
-                v-if="this.beatmap_set.maps.length >= 15"
-                class="diff-count"
+            <div v-for="mode in this.modes" :key="mode">
+              <el-space
+                v-if="this.mapFilter(mode).length !== 0"
+                align="center"
+                :size="this.diffspace"
               >
-                {{ this.osuMaps.length }}
-              </span>
-            </el-space>
-            <el-space
-              align="center"
-              v-if="this.taikoMaps.length !== 0"
-              :size="this.diffspace"
-            >
-              <img
-                class="gamemode-icon"
-                src="../assets/osu/mode-taiko-small.png"
-              />
-              <div
-                class="diff"
-                v-if="this.beatmap_set.maps.length < 15"
-                v-for="beatmap in this.taikoMaps"
-                :style="{ background: this.diffColor(beatmap.difficult) }"
-              ></div>
-              <span
-                v-if="this.beatmap_set.maps.length >= 15"
-                class="diff-count"
-              >
-                {{ this.taikoMaps.length }}
-              </span>
-            </el-space>
-            <el-space
-              align="center"
-              v-if="this.catchMaps.length !== 0"
-              :size="this.diffspace"
-            >
-              <img
-                class="gamemode-icon"
-                src="../assets/osu/mode-fruits-small.png"
-              />
-              <div
-                class="diff"
-                v-if="this.beatmap_set.maps.length < 15"
-                v-for="beatmap in this.catchMaps"
-                :style="{ background: this.diffColor(beatmap.difficult) }"
-              ></div>
-              <span
-                v-if="this.beatmap_set.maps.length >= 15"
-                class="diff-count"
-              >
-                {{ this.catchMaps.length }}
-              </span>
-            </el-space>
-            <el-space
-              align="center"
-              v-if="this.maniaMaps.length !== 0"
-              :size="this.diffspace"
-            >
-              <img
-                class="gamemode-icon"
-                src="../assets/osu/mode-mania-small.png"
-              />
-              <div
-                class="diff"
-                v-if="this.beatmap_set.maps.length < 15"
-                v-for="beatmap in this.maniaMaps"
-                :style="{ background: this.diffColor(beatmap.difficult) }"
-              ></div>
-              <span
-                v-if="this.beatmap_set.maps.length >= 15"
-                class="diff-count"
-              >
-                {{ this.maniaMaps.length }}
-              </span>
-            </el-space>
+                <img class="gamemode-icon" :src="this.getModePic(mode)" />
+                <el-space
+                  v-if="this.mapFilter(mode).length < 15"
+                  class="diffs__inner"
+                  :size="this.diffspace"
+                >
+                  <div
+                    class="diff"
+                    v-for="beatmap in this.mapFilter(mode)"
+                    :key="beatmap.id"
+                    :style="{ background: this.diffColor(beatmap.difficult) }"
+                  ></div>
+                </el-space>
+                <span
+                  v-if="this.mapFilter(mode).length >= 15"
+                  class="diff-count"
+                >
+                  {{ this.mapFilter(mode).length }}
+                </span>
+              </el-space>
+            </div>
           </div>
         </el-space>
       </div>
@@ -160,6 +98,7 @@
             class="diff-detail"
             :size="4"
             align="baseline"
+            :key="map.id"
             v-for="map in this.beatmap_set.maps"
           >
             <img class="gamemode-icon" :src="this.getModePic(map.mode)" />
@@ -183,16 +122,20 @@ import { PropType } from "vue";
 import { IBeatmapSet } from "@src/common/interfaces/osu";
 import { GameMode, Approved } from "@src/common/enums/osu";
 import { Modal } from "ant-design-vue";
+import store from "@src/common/utils/store";
+import { IBeatmap } from "@src/common/interfaces/osu";
+import PlayerSingleton from "@src/common/utils/player";
 
 export default {
   name: "SongCard",
   props: {
     beatmap_set: {
       type: Object as PropType<IBeatmapSet>,
-      require: true,
+      required: true,
     },
   },
   data() {
+    const player = PlayerSingleton.instance
     return {
       colors: [
         "#4fbdfc",
@@ -208,6 +151,8 @@ export default {
       modalVisible: false,
       mouseInDetailDiv: false,
       mouseInDiffsDiv: false,
+      modes: [0, 1, 2, 3],
+      player
     };
   },
   methods: {
@@ -300,13 +245,13 @@ export default {
       }
       let index = 0;
       while (diff > this.diffs[index]) index++;
-      const step = parseInt((this.diffs[index] - this.diffs[index - 1]) * 100);
-      const i = parseInt((diff - this.diffs[index - 1]) * 100);
+      const step = (this.diffs[index] - this.diffs[index - 1]) * 100;
+      const i = (diff - this.diffs[index - 1]) * 100;
       return this.gradientColor(
         this.colors[index - 1],
         this.colors[index],
-        step,
-        i
+        Math.round(step),
+        Math.round(i)
       );
     },
     getModePic(mode: GameMode): string {
@@ -322,7 +267,7 @@ export default {
       }
       return "";
     },
-    handleOk(e) {
+    handleOk(e: any) {
       console.log(e);
     },
     showModal() {
@@ -339,28 +284,41 @@ export default {
         },
       });
     },
+    mapFilter(mode: number): IBeatmap[] {
+      return this.beatmap_set.maps.filter((v) => v.mode == mode);
+    },
+    addSongAndPlay() {
+      if (this.beatmap_set.audio) {
+        const url = `https://dl.sayobot.cn/beatmaps/files/${this.beatmap_set.id}/${this.beatmap_set.audio}`
+        const title = this.displayTitle.toString()
+        const id = this.player.addAudioToPlaylist(url, title, this.beatmap_set.id as number)
+        this.player.play(id)
+      }
+    }
   },
   computed: {
-    approvedClass() {
+    approvedClass(): string {
       return Approved[this.beatmap_set.approved] + " approved-status";
     },
-    approved() {
+    approved(): string {
       return Approved[this.beatmap_set.approved].toUpperCase();
     },
-    osuMaps() {
-      return this.beatmap_set.maps.filter((v) => v.mode == GameMode.osu);
-    },
-    taikoMaps() {
-      return this.beatmap_set.maps.filter((v) => v.mode == GameMode.taiko);
-    },
-    catchMaps() {
-      return this.beatmap_set.maps.filter((v) => v.mode == GameMode.catch);
-    },
-    maniaMaps() {
-      return this.beatmap_set.maps.filter((v) => v.mode == GameMode.mania);
-    },
-    detailShow() {
+    detailShow(): boolean {
       return this.mouseInDetailDiv || this.mouseInDiffsDiv;
+    },
+    displayTitle(): String {
+      const uni = store.get("displayWithUnicode");
+      let ret: String | undefined;
+      if (uni) ret = this.beatmap_set?.titleU || this.beatmap_set?.title;
+      else ret = this.beatmap_set?.title;
+      return ret || "";
+    },
+    displayArtist(): String {
+      const uni = store.get("displayWithUnicode");
+      let ret: String | undefined;
+      if (uni) ret = this.beatmap_set?.artistU || this.beatmap_set?.artist;
+      else ret = this.beatmap_set?.artist;
+      return ret || "";
     },
   },
 };
@@ -572,11 +530,16 @@ export default {
             font-weight: 800;
           }
 
-          .diff {
-            margin-top: 2px;
-            width: 7px;
-            height: 14px;
-            border-radius: 14px;
+          .diffs__inner {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            .diff {
+              margin-top: 2px;
+              width: 7px;
+              height: 14px;
+              border-radius: 14px;
+            }
           }
         }
       }
@@ -644,7 +607,7 @@ export default {
       margin-top: 10px;
       padding: 10px 5px;
       border-radius: 0 0 @song-card-radius @song-card-radius;
-      background-color: hsla(200, 10%, 30%, .7);
+      background-color: hsla(200, 10%, 30%, 0.7);
       backdrop-filter: blur(5px);
       overflow: visible;
       &::before,
