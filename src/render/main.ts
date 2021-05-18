@@ -16,7 +16,9 @@ import {
   faVolumeDown,
   faVolumeMute,
   faVolumeOff,
-  faVolumeUp
+  faVolumeUp,
+  faListUl,
+  faTimes
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faHeart,
@@ -53,6 +55,8 @@ library.add(
   faVolumeMute,
   faVolumeOff,
   faVolumeUp,
+  faListUl,
+  faTimes
 );
 
 createApp(App)

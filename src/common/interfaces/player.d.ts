@@ -10,4 +10,5 @@ export interface PlayListItem {
   duration?: number;
   timer?: number;
   howl?: Howl;
+  deleted: boolean
 }

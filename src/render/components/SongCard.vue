@@ -67,22 +67,20 @@
       </div>
       <div class="menu">
         <div class="menu-inner">
-          <a-tooltip title="收藏铺面">
+          <!-- <a-tooltip title="收藏铺面">
             <font-awesome-icon
               :icon="['far', 'heart']"
               class="fa-icon"
             ></font-awesome-icon>
-          </a-tooltip>
-          <a-tooltip title="下载">
-            <a
-              :href="`https://dl.sayobot.cn/beatmaps/download/full/${this.beatmap_set.id}`"
-            >
-              <font-awesome-icon
-                :icon="['fas', 'file-download']"
-                class="fa-icon"
-              ></font-awesome-icon>
-            </a>
-          </a-tooltip>
+          </a-tooltip> -->
+          <el-tooltip content="下载">
+            <font-awesome-icon
+              :icon="['fas', 'file-download']"
+              class="fa-icon"
+              @click="download"
+              style="cursor: pointer;"
+            ></font-awesome-icon>
+          </el-tooltip>
         </div>
       </div>
     </div>
@@ -125,6 +123,10 @@ import { Modal } from "ant-design-vue";
 import store from "@src/common/utils/store";
 import { IBeatmap } from "@src/common/interfaces/osu";
 import PlayerSingleton from "@src/common/utils/player";
+import {
+  newDownloadFile,
+  getDownloadPath,
+} from "@/hooks/download/ipc-renderer";
 
 export default {
   name: "SongCard",
@@ -135,7 +137,7 @@ export default {
     },
   },
   data() {
-    const player = PlayerSingleton.instance
+    const player = PlayerSingleton.instance;
     return {
       colors: [
         "#4fbdfc",
@@ -152,7 +154,7 @@ export default {
       mouseInDetailDiv: false,
       mouseInDiffsDiv: false,
       modes: [0, 1, 2, 3],
-      player
+      player,
     };
   },
   methods: {
@@ -289,12 +291,26 @@ export default {
     },
     addSongAndPlay() {
       if (this.beatmap_set.audio) {
-        const url = `https://dl.sayobot.cn/beatmaps/files/${this.beatmap_set.id}/${this.beatmap_set.audio}`
-        const title = this.displayTitle.toString()
-        const id = this.player.addAudioToPlaylist(url, title, this.beatmap_set.id as number)
-        this.player.play(id)
+        const url = `https://dl.sayobot.cn/beatmaps/files/${this.beatmap_set.id}/${this.beatmap_set.audio}`;
+        const title = `${this.displayTitle.toString()} - ${this.displayArtist.toString()}`;
+        const id = this.player.addAudioToPlaylist(
+          url,
+          title,
+          this.beatmap_set.id as number
+        );
+        this.player.play(id);
       }
-    }
+    },
+    async download() {
+      const url = `https://dl.sayobot.cn/beatmaps/download/full/${this.beatmap_set.id}`;
+      const fileName = `${this.beatmap_set.id} ${this.beatmap_set.title} - ${this.beatmap_set.artist}.osz`;
+      const path = await getDownloadPath();
+      newDownloadFile({
+        url,
+        fileName,
+        path,
+      });
+    },
   },
   computed: {
     approvedClass(): string {

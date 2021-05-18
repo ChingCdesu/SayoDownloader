@@ -123,7 +123,6 @@
 <script lang="ts">
 import { IBeatmapSet } from "@src/common/interfaces/osu";
 import SongCard from "@/components/SongCard.vue";
-import PlayerSingleton from "@src/common/utils/player";
 import Player from "@/components/Player.vue";
 import { apiData2IBeatmapSet } from "@src/common/utils/data-trans";
 import Api from "@src/common/utils/api";
@@ -328,14 +327,12 @@ export default {
       { label: "意大利语", value: 2048 },
     ];
     const filterBtnClass = "filter-checkbox-btn";
-    const player = PlayerSingleton.instance
     return {
       filterBtnClass,
       modeOptions,
       approvedOptions,
       genreOptions,
-      languageOptions,
-      player
+      languageOptions
     };
   },
 };

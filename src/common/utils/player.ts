@@ -16,13 +16,17 @@ declare global {
 }
 
 class PlayerSingleton {
-  private constructor() {}
+  private constructor() { }
+
+  private _playlistLoop: PlayListLoop = "list";
+  private _playlist: PlayListItem[] = [];
+  private _error: boolean = false;
+  private _playingIndex = -1;
+  private _playing = false;
 
   public walkSync: (item: PlayListItem) => void = function (
     item: PlayListItem
-  ) {};
-
-  private _playlistLoop: PlayListLoop = "list";
+  ) { };
 
   public get playlistLoop() {
     return this._playlistLoop;
@@ -32,12 +36,6 @@ class PlayerSingleton {
     this._playlistLoop = loop;
   }
 
-  private _onPlayEnd = () => {
-    this.nextSong()
-  };
-
-  private _playlist: PlayListItem[] = [];
-
   public get playlist(): PlayListItem[] {
     let ret: PlayListItem[] = []
     this._playlist.forEach(v => {
@@ -45,25 +43,21 @@ class PlayerSingleton {
         sid: v.sid,
         url: v.url,
         id: v.id,
-        title: v.title
+        title: v.title,
+        deleted: v.deleted
       })
     })
-    return ret
+    return ret.filter(v => !v.deleted)
   }
-
-  private _error: boolean = false;
 
   public get error(): boolean {
     return this._error;
   }
 
-  private _playingIndex = -1;
 
   public get playingIndex(): number {
     return this._playingIndex;
   }
-
-  private _playing = false;
 
   public get playing(): boolean {
     return this._playing;
@@ -77,19 +71,48 @@ class PlayerSingleton {
   }
 
   public addAudioToPlaylist(url: string, title: string, sid: number): string {
-    const uuid = uuidV4();
-    this._playlist.push({
-      sid,
-      id: uuid,
-      url,
-      title,
-    });
-    return uuid;
+    const index = this._playlist.findIndex(v => v.url === url)
+    if (index === -1) {
+      const uuid = uuidV4();
+      this._playlist.push({
+        sid,
+        id: uuid,
+        url,
+        title,
+        deleted: false
+      });
+      return uuid;
+    } else {
+      this._playlist[index].deleted = false
+      return this._playlist[index].id
+    }
   }
 
   public removePlaylistItem(id: string) {
-    const index = this._playlist.findIndex((v) => v.id === id);
-    if (index !== -1) this._playlist.splice(index, 1);
+    const index = this._playlist.findIndex(v => v.id === id);
+    const originPlaying = this._playingIndex === index;
+    if (originPlaying) { this.nextSong(); }
+    if (index !== -1) this._playlist[index].deleted = true;
+  }
+
+  private step = () => {
+    if (this._playing) {
+      this._playlist[this._playingIndex].timer =
+        Math.round(
+          this._playlist[this._playingIndex].howl?.seek() as number
+        ) || 0;
+      var item: PlayListItem = this._playlist[this._playingIndex]
+      this.walkSync({
+        id: item.id,
+        sid: item.sid,
+        title: item.title,
+        url: item.url,
+        timer: item.timer,
+        duration: item.duration,
+        deleted: item.deleted
+      });
+      window.requestAnimationFrame(this.step)
+    }
   }
 
   public play(id: string) {
@@ -98,39 +121,38 @@ class PlayerSingleton {
     });
     const index = this._playlist.findIndex((v) => v.id === id);
     this._playingIndex = index;
-    if (index !== -1) {
-      this._playing = true;
-      this._playlist[this._playingIndex].howl = new Howl({
-        src: [this._playlist[this._playingIndex].url],
-        onload: () => {
-          this._playlist[this._playingIndex].duration =
-            this._playlist[this._playingIndex].howl?.duration();
-        },
-        onend: this._onPlayEnd,
-        onplay: () => {
-          this._playlist[this._playingIndex].timer =
-            Math.round(
-              this._playlist[this._playingIndex].howl?.seek() as number
-            ) || 0;
-          var item: PlayListItem = this._playlist[this._playingIndex]
-          this.walkSync({
-            id: item.id,
-            sid: item.sid,
-            title: item.title,
-            url: item.url,
-            timer: item.timer,
-            duration: item.duration
-          });
-        },
-        onplayerror: () => {
-          this._playing = false;
-          this._error = true;
-        },
-        onloaderror: () => {
-          this._playing = false;
-          this._error = true;
-        },
-      });
+    if (index !== -1 && !this._playlist[index].deleted) {
+      if (!this._playlist[this._playingIndex].howl) {
+        this._playlist[this._playingIndex].howl = new Howl({
+          src: [this._playlist[this._playingIndex].url],
+          onload: () => {
+            this._playlist[this._playingIndex].duration =
+              this._playlist[this._playingIndex].howl?.duration();
+          },
+          onend: () => {
+            this._playing = false;
+            this.nextSong();
+          },
+          onplayerror: () => {
+            this._playing = false;
+            this._error = true;
+          },
+          onloaderror: () => {
+            this._playing = false;
+            this._error = true;
+          },
+          onplay: () => {
+            this._playing = true
+            window.requestAnimationFrame(this.step)
+          },
+          onpause: () => {
+            this._playing = false
+          },
+          onstop: () => {
+            this._playing = false
+          }
+        });
+      }
       this._playlist[this._playingIndex].howl?.play();
     } else {
       this._playing = false;
@@ -161,11 +183,11 @@ class PlayerSingleton {
   }
 
   public getVolume(): number {
-    return Math.round(Howler.volume() * 100);
+    return Math.floor(Howler.volume() * 100)
   }
 
   public setVolume(volume: number) {
-    Howler.volume(volume / 100);
+    Howler.volume(volume / 100)
   }
 
   public seek(time: number) {
@@ -174,37 +196,43 @@ class PlayerSingleton {
   }
 
   public previousSong() {
-    this._playing = false;
-    if (
-      this._playlistLoop === "list" &&
-      this._playingIndex === 0
-    )
-      return;
-    if (this._playlistLoop === "list-loop") {
-      if (this._playingIndex === 0) this._playingIndex = this._playlist.length - 1;
-      else --this._playingIndex;
-    }
-    if (this._playlistLoop === "random") {
-      this._playingIndex = Math.floor(Math.random() * this._playlist.length);
-    }
+    do {
+      if (0 === this._playlist.filter(v => !v.deleted).length) break;
+      if (
+        this._playlistLoop === "list"
+      ) {
+        if (0 === this._playingIndex) return;
+        else --this._playingIndex;
+      }
+      if (this._playlistLoop === "list-loop") {
+        if (this._playingIndex === 0) this._playingIndex = this._playlist.length - 1;
+        else --this._playingIndex;
+      }
+      if (this._playlistLoop === "random") {
+        this._playingIndex = Math.floor(Math.random() * this._playlist.length);
+      }
+    } while (!this._playlist[this._playingIndex].deleted)
     this.play(this._playlist[this._playingIndex].id);
   }
 
   public nextSong() {
-    this._playing = false;
-    if (
-      this._playlistLoop === "list" &&
-      this._playlist.length - 1 === this._playingIndex
-    )
-      return;
-    if (this._playlistLoop === "list-loop") {
-      if (this._playlist.length - 1 === this._playingIndex)
-        this._playingIndex = 0;
-      else ++this._playingIndex;
-    }
-    if (this._playlistLoop === "random") {
-      this._playingIndex = Math.floor(Math.random() * this._playlist.length);
-    }
+    do {
+      if (0 === this._playlist.filter(v => !v.deleted).length) break;
+      if (
+        this._playlistLoop === "list"
+      ) {
+        if (this._playlist.length - 1 === this._playingIndex) return;
+        else ++this._playingIndex
+      }
+      if (this._playlistLoop === "list-loop") {
+        if (this._playlist.length - 1 === this._playingIndex)
+          this._playingIndex = 0;
+        else ++this._playingIndex;
+      }
+      if (this._playlistLoop === "random") {
+        this._playingIndex = Math.floor(Math.random() * this._playlist.length);
+      }
+    } while (!this._playlist[this._playingIndex].deleted)
     this.play(this._playlist[this._playingIndex].id);
   }
 }
