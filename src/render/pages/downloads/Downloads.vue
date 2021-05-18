@@ -104,7 +104,7 @@ export default {
       )
       return allBytes
     }
-    const handleUpdate = (event, item: IDownloadFile) => {
+    const handleUpdate = (_: any, item: IDownloadFile) => {
       const index = dh.value.findIndex(d => d.id === item.id)
       if (index < 0) {
         dh.value.unshift(item)
@@ -123,7 +123,7 @@ export default {
     }
   },
   methods: {
-    async btnClick(event) {
+    async btnClick() {
       const file: INewDownloadFile = {
         url: "https://dl.sayobot.cn/beatmaps/download/full/886402",
         fileName: "Kano - Daisy Blue.osz",

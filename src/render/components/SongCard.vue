@@ -48,6 +48,7 @@
                 class="diff"
                 v-if="this.beatmap_set.maps.length < 15"
                 v-for="beatmap in this.osuMaps"
+                :key="beatmap.id"
                 :style="{ background: this.diffColor(beatmap.difficult) }"
               ></div>
               <span
