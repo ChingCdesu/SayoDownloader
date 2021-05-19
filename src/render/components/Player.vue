@@ -133,7 +133,7 @@ export default {
     let storedVolume = volume;
     let mute = volume === 0;
     player.walkSync = (it: PlayListItem) => {
-      // 这里必须为this.item，函数触发的时候已经渲染完了
+      // @ts-ignore: 这里必须为this.item，函数触发的时候已经渲染完了
       this.item = it;
     };
     return {
@@ -254,6 +254,7 @@ export default {
   border: none;
   padding: 0;
   overflow: hidden;
+  user-select: none;
   .playlist-popover__content {
     cursor: pointer;
     padding: 12px;

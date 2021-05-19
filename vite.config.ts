@@ -57,10 +57,11 @@ export default defineConfig(env => {
         build: {
             outDir: join(__dirname, 'dist/render'),
             emptyOutDir: true,
-            minify: false,
+            minify: !isserve,
+            cssCodeSplit: false,
             commonjsOptions: {},
             assetsDir: '', // 相对路径 加载问题
-            sourcemap: true,
+            sourcemap: isserve,
             rollupOptions: {
                 plugins: [
                     // typescript({ module: 'ESNext' }),

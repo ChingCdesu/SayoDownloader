@@ -29,7 +29,6 @@ export interface INewDownloadFile {
 export interface IDownloadFile {
     id: string
     url: string
-    icon: string
     fileName: string
     path: string
     state: DownloadItemState
@@ -39,7 +38,7 @@ export interface IDownloadFile {
     totalBytes: number
     receivedBytes: number
     paused: boolean
-    _sourceItem: DownloadItem | undefined
+    _sourceItem?: DownloadItem
 }
 
 export interface IDownloadBytes {

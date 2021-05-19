@@ -12,8 +12,8 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/home'),
     meta: {
       icon: <HomeOutlined />,
-      name: '首页',
-    } as RouteMeta,
+      name: '首页'
+    },
   },
   {
     path: '/downloads',
@@ -21,7 +21,7 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       icon: <CloudDownloadOutlined />,
       name: '下载'
-    } as RouteMeta
+    }
   },
   {
     path: '/settings',
@@ -29,7 +29,7 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       icon: <SettingOutlined />,
       name: '设置'
-    } as RouteMeta
+    }
   }
 ]
 

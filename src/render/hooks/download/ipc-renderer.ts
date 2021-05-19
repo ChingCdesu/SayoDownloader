@@ -82,8 +82,8 @@ export const openFileInFolder = (path: string): Promise<boolean> =>
  * 获取下载数据
  * @param page - 分页
  */
-export const getDownloadData = (page: IPagination): Promise<IDownloadFile[]> =>
-    ipcRendererInvoke('getDownloadData', page)
+export const getDownloadData = (): Promise<IDownloadFile[]> =>
+    ipcRendererInvoke('getDownloadData')
 
 /**
  * 删除下载项。下载中的将先取消，再删除
@@ -131,3 +131,11 @@ export const listenerDownloadItemUpdate = (
 export const listenerDownloadItemDone = (
     callback: (event: IpcRendererEvent, ...args: any[]) => void,
 ): void => ipcRendererListener('downloadItemDone', callback)
+
+/**
+ * 监听下载项删除事件
+ * @param callback - 回调函数
+ */
+//  export const listenerDownloadItemRemove = (
+//     callback: (event: IpcRendererEvent, ...args: any[]) => void,
+// ): void => ipcRendererListener('removeDownloadItem', callback)

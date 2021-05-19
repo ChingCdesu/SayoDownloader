@@ -1,4 +1,4 @@
-import {app, BrowserWindow, session, dialog, WebContents, DownloadItem} from 'electron'
+import {app, BrowserWindow, session, dialog, WebContents, DownloadItem, webContents} from 'electron'
 
 import {IDownloadFile, INewDownloadFile, IPagination} from '@src/common/interfaces/download'
 import {
@@ -211,7 +211,7 @@ const downloadFile = (newItem: INewDownloadFile) => {
 
     // 判断是否存在
     if (isExistFile(downloadPath)) {
-        const id = existItem?.id || uuidV4()
+        const id = existItem?.id || ''
         return {id, ...newItem}
     }
 
@@ -290,8 +290,8 @@ const getDownloadItemCount = () => {
 const listenerEvent = () => {
 
     // 获取下载数据
-    ipcMainHandle('getDownloadData', (event, page: IPagination) => {
-        return getDownloadData(downloadItemData, page)
+    ipcMainHandle('getDownloadData', (event) => {
+        return deleteSourceItem(downloadItemData)
     })
 
     // 新建下载

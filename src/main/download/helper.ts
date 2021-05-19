@@ -144,7 +144,6 @@ export const addDownloadItem = async ({
   const downloadItem: IDownloadFile = {
     id: fileId,
     url: fileUrl,
-    icon: fileIcon,
     fileName,
     path: savePath,
     state: item.getState(),

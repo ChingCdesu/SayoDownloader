@@ -67,18 +67,12 @@
       </div>
       <div class="menu">
         <div class="menu-inner">
-          <!-- <a-tooltip title="收藏铺面">
-            <font-awesome-icon
-              :icon="['far', 'heart']"
-              class="fa-icon"
-            ></font-awesome-icon>
-          </a-tooltip> -->
-          <el-tooltip content="下载">
+          <el-tooltip :content="this.downloadTooltip">
             <font-awesome-icon
               :icon="['fas', 'file-download']"
               class="fa-icon"
-              @click="download"
-              style="cursor: pointer;"
+              @click="this.download"
+              style="cursor: pointer"
             ></font-awesome-icon>
           </el-tooltip>
         </div>
@@ -119,10 +113,13 @@
 import { PropType } from "vue";
 import { IBeatmapSet } from "@src/common/interfaces/osu";
 import { GameMode, Approved } from "@src/common/enums/osu";
-import { Modal } from "ant-design-vue";
 import store from "@src/common/utils/store";
 import { IBeatmap } from "@src/common/interfaces/osu";
 import PlayerSingleton from "@src/common/utils/player";
+import ModeOsuIcon from "@/assets/osu/mode-osu-small.png";
+import ModeTaikoIcon from "@/assets/osu/mode-taiko-small.png";
+import ModeCatchIcon from "@/assets/osu/mode-fruits-small.png";
+import ModeManiaIcon from "@/assets/osu/mode-mania-small.png";
 import {
   newDownloadFile,
   getDownloadPath,
@@ -155,6 +152,7 @@ export default {
       mouseInDiffsDiv: false,
       modes: [0, 1, 2, 3],
       player,
+      downloadTooltip: "下载",
     };
   },
   methods: {
@@ -256,16 +254,16 @@ export default {
         Math.round(i)
       );
     },
-    getModePic(mode: GameMode): string {
+    getModePic(mode: GameMode) {
       switch (mode) {
         case GameMode.osu:
-          return "../assets/osu/mode-osu-small.png";
+          return ModeOsuIcon;
         case GameMode.taiko:
-          return "../assets/osu/mode-taiko-small.png";
+          return ModeTaikoIcon;
         case GameMode.catch:
-          return "../assets/osu/mode-fruits-small.png";
+          return ModeCatchIcon;
         case GameMode.mania:
-          return "../assets/osu/mode-mania-small.png";
+          return ModeManiaIcon;
       }
       return "";
     },
@@ -273,18 +271,18 @@ export default {
       console.log(e);
     },
     showModal() {
-      const modal = Modal.confirm({
-        title: "This is a notification message",
-        content: `Test.`,
-        maskClosable: true,
-        centered: true,
-        onCancel: () => {
-          modal.destroy();
-        },
-        onOk: () => {
-          modal.destroy();
-        },
-      });
+      // const modal = Modal.confirm({
+      //   title: "This is a notification message",
+      //   content: `Test.`,
+      //   maskClosable: true,
+      //   centered: true,
+      //   onCancel: () => {
+      //     modal.destroy();
+      //   },
+      //   onOk: () => {
+      //     modal.destroy();
+      //   },
+      // });
     },
     mapFilter(mode: number): IBeatmap[] {
       return this.beatmap_set.maps.filter((v) => v.mode == mode);
@@ -309,7 +307,30 @@ export default {
         url,
         fileName,
         path,
-      });
+      })
+        .then((data) => {
+          if (!data) {
+            this.downloadTooltip = "已加入下载队列";
+            setTimeout(() => {
+              this.downloadTooltip = "下载";
+            }, 4500);
+          } else {
+            // @ts-ignore
+            this.$notify({
+              title: "文件已存在",
+              message: `${fileName} 已存在于 ${path}，下载将不会创建。`,
+              type: "warning",
+            });
+          }
+        })
+        .catch((err) => {
+          // @ts-ignore
+          this.$notify({
+            title: "出现错误",
+            message: `下载将不会创建。${err}`,
+            type: "error",
+          });
+        });
     },
   },
   computed: {
@@ -491,6 +512,8 @@ export default {
           width: 20px;
           height: 20px;
           margin: 0 2px;
+          vertical-align: middle;
+
         }
 
         .graveyard {
@@ -657,6 +680,7 @@ export default {
           width: 14px;
           height: 14px;
           margin-bottom: 2px;
+          vertical-align: middle;
         }
 
         .stars {

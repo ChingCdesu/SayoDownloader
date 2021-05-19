@@ -1,5 +1,4 @@
 import { defineComponent } from 'vue'
-import { Layout } from 'ant-design-vue'
 import { ElContainer, ElMain, ElAside, ElBacktop } from 'element-plus'
 import Slider from './slider'
 import './index.less'
