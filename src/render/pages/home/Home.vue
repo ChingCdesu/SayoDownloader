@@ -117,7 +117,7 @@
       </el-row>
     </div>
   </div>
-  <Player  />
+  <Player />
 </template>
 
 <script lang="ts">
@@ -212,9 +212,17 @@ export default {
       result &&= filter.bpm?.reduce((p, v) => (p += v), 0) === 0;
       return result;
     };
-    const onSearch = () => {
+    const onSearch = async () => {
       page.value = 0;
       sets.value = [];
+      const try_convert = Number(keyword.value);
+      if (try_convert !== NaN) {
+        const result = await Api.get(`/v2/beatmapinfo?K=${try_convert}`);
+        if (result && result.status === 200 && result.data.status === 0) {
+          const data = result.data.data as IApiBeatmapSet;
+          sets.value.push(apiData2IBeatmapSet(data));
+        }
+      }
       // 等第一页加载结束才启用自动滚动加载
       autoload.value = false;
       loadMore();
@@ -332,7 +340,7 @@ export default {
       modeOptions,
       approvedOptions,
       genreOptions,
-      languageOptions
+      languageOptions,
     };
   },
 };
@@ -368,6 +376,9 @@ export default {
         border: 1px solid hsl(200, 10%, 20%);
         color: #fff;
         transition: all cubic-bezier(0.645, 0.045, 0.355, 1) 0.2s;
+        font-family: Torus, sans-serif;
+        font-weight: 600;
+        font-size: 18px;
         &:focus,
         &:hover {
           border: 1px solid hsl(200, 40%, 80%);
