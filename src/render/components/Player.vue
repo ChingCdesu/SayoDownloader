@@ -50,19 +50,19 @@
         <font-awesome-icon
           class="control-btn"
           :icon="['fas', 'volume-up']"
-          v-if="this.volume >= 50 && !this.mute"
+          v-if="this.volume >= 50"
           @click="this.doMute"
         />
         <font-awesome-icon
           class="control-btn"
           :icon="['fas', 'volume-down']"
-          v-if="this.volume < 50 && this.volume > 0 && !this.mute"
+          v-if="this.volume < 50 && this.volume > 0"
           @click="this.doMute"
         />
         <font-awesome-icon
           class="control-btn"
           :icon="['fas', 'volume-mute']"
-          v-if="this.volume === 0 || this.mute"
+          v-if="this.volume === 0"
           @click="this.unmute"
         />
       </div>
@@ -131,7 +131,6 @@ export default {
     const player = PlayerSingleton.instance;
     let volume = player.getVolume();
     let storedVolume = volume;
-    let mute = volume === 0;
     player.walkSync = (it: PlayListItem) => {
       // @ts-ignore: 这里必须为this.item，函数触发的时候已经渲染完了
       this.item = it;
@@ -140,7 +139,6 @@ export default {
       player,
       item,
       volume,
-      mute,
       storedVolume,
     };
   },
@@ -171,7 +169,8 @@ export default {
       this.player.nextSong();
     },
     changeVolume(volume: number) {
-      this.storedVolume = volume;
+      if (volume !== 0)
+        this.storedVolume = volume;
       this.player.setVolume(volume);
     },
     secondToTime(sec: number): string {
@@ -182,14 +181,13 @@ export default {
         .padStart(2, "0")}`;
     },
     doMute() {
-      this.mute = true;
+      this.storedVolume = this.volume;
       this.volume = 0;
-      this.player.setVolume(0);
+      // this.player.setVolume(0);
     },
     unmute() {
-      this.mute = false;
       this.volume = this.storedVolume;
-      this.player.setVolume(this.volume);
+      // this.player.setVolume(this.volume);
     },
   },
 };
@@ -238,6 +236,7 @@ export default {
     align-items: center;
     .volume-icon {
       width: 40px;
+      text-align: left;
     }
     .volume-bar {
       flex: 1;

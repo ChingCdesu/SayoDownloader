@@ -318,8 +318,8 @@ export default {
             // @ts-ignore
             this.$notify({
               title: "文件已存在",
-              message: `${fileName} 已存在于 ${path}，下载将不会创建。`,
-              type: "warning",
+              message: `${fileName} 已存在于 ${path}，将不会下载该铺面。`,
+              type: "warning"
             });
           }
         })
@@ -327,7 +327,7 @@ export default {
           // @ts-ignore
           this.$notify({
             title: "出现错误",
-            message: `下载将不会创建。${err}`,
+            message: `不会下载该文件。原因是：${err}。`,
             type: "error",
           });
         });

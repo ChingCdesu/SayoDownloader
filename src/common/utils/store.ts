@@ -4,9 +4,9 @@ import { app } from 'electron'
 export default new Store({
     name: 'store',
     migrations: {
-        '0.0.1': store => {
+        '0.1.0': store => {
             store.set('debugPhase', true)
-            store.set('phase', '0.0.1')
+            store.set('phase', '0.1.0')
         }
     },
     defaults: {
