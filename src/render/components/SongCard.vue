@@ -18,7 +18,7 @@
       <div class="play" @click="this.addSongAndPlay">
         <font-awesome-icon :icon="['fas', 'play']" />
       </div>
-      <div class="info" @click="showModal">
+      <div class="info" @click="this.modalVisible = true">
         <span class="song-title info-text">{{ this.displayTitle }}</span>
         <span class="song-artist info-text"
           >作曲/歌手: {{ this.displayArtist }}</span
@@ -35,13 +35,16 @@
             {{ this.approved }}
           </div>
           <div class="diffs">
-            <div v-for="mode in this.modes" :key="mode">
+            <el-space v-for="mode in this.modes" :key="mode" :size="3">
               <el-space
                 v-if="this.mapFilter(mode).length !== 0"
                 align="center"
                 :size="this.diffspace"
               >
-                <img class="gamemode-icon" :src="this.getModePic(mode)" />
+                <i
+                  class="icon-osu diffs-mode-icon"
+                  :class="this.getModeIconClass(mode)"
+                />
                 <el-space
                   v-if="this.mapFilter(mode).length < 15"
                   class="diffs__inner"
@@ -61,7 +64,7 @@
                   {{ this.mapFilter(mode).length }}
                 </span>
               </el-space>
-            </div>
+            </el-space>
           </div>
         </el-space>
       </div>
@@ -85,27 +88,54 @@
         @mouseenter="this.mouseInDetailDiv = true"
         @mouseleave="this.mouseInDetailDiv = false"
       >
-        <div class="diff-details__inner">
-          <el-space
-            class="diff-detail"
-            :size="4"
-            align="baseline"
-            :key="map.id"
-            v-for="map in this.beatmap_set.maps"
+        <el-space
+          class="diff-details__inner"
+          direction="vertical"
+          alignment="start"
+        >
+          <div
+            class="diff-details__mode"
+            v-for="mode in this.modes"
+            :key="mode"
           >
-            <img class="gamemode-icon" :src="this.getModePic(map.mode)" />
-            <span
-              class="stars"
-              :style="{ background: this.diffColor(map.difficult) }"
+            <el-space
+              class="diff-detail"
+              :size="2"
+              alignment="baseline"
+              :key="map.id"
+              v-for="map in this.beatmap_set.maps.filter(
+                (m) => m.mode === mode
+              )"
             >
-              <font-awesome-icon :icon="['fas', 'star']" />
-              {{ map.difficult.toFixed(2) }}
-            </span>
-            <span>{{ map.name }}</span>
-          </el-space>
-        </div>
+              <i
+                class="icon-osu detail-popover-mode-icon"
+                :class="this.getModeIconClass(map.mode)"
+              />
+              <span
+                class="stars"
+                :style="{ background: this.diffColor(map.difficult) }"
+              >
+                <font-awesome-icon :icon="['fas', 'star']" />
+                {{ map.difficult.toFixed(2) }}
+              </span>
+              <span>{{ map.name }}</span>
+            </el-space>
+          </div>
+        </el-space>
       </div>
     </el-collapse-transition>
+    <el-dialog
+      v-model="this.modalVisible"
+      :modal="true"
+      :show-close="false"
+      :destroy-on-close="true"
+      :lock-scroll="true"
+      :append-to-body="true"
+      :center="true"
+      custom-class="song-detail-modal"
+    >
+    
+    </el-dialog>
   </div>
 </template>
 
@@ -116,10 +146,6 @@ import { GameMode, Approved } from "@src/common/enums/osu";
 import store from "@src/common/utils/store";
 import { IBeatmap } from "@src/common/interfaces/osu";
 import PlayerSingleton from "@src/common/utils/player";
-import ModeOsuIcon from "@/assets/osu/mode-osu-small.png";
-import ModeTaikoIcon from "@/assets/osu/mode-taiko-small.png";
-import ModeCatchIcon from "@/assets/osu/mode-fruits-small.png";
-import ModeManiaIcon from "@/assets/osu/mode-mania-small.png";
 import {
   newDownloadFile,
   getDownloadPath,
@@ -150,7 +176,6 @@ export default {
       modalVisible: false,
       mouseInDetailDiv: false,
       mouseInDiffsDiv: false,
-      modes: [0, 1, 2, 3],
       player,
       downloadTooltip: "下载",
     };
@@ -254,35 +279,17 @@ export default {
         Math.round(i)
       );
     },
-    getModePic(mode: GameMode) {
+    getModeIconClass(mode: GameMode) {
       switch (mode) {
         case GameMode.osu:
-          return ModeOsuIcon;
+          return "mode-osu";
         case GameMode.taiko:
-          return ModeTaikoIcon;
+          return "mode-taiko";
         case GameMode.catch:
-          return ModeCatchIcon;
+          return "mode-catch";
         case GameMode.mania:
-          return ModeManiaIcon;
+          return "mode-mania";
       }
-      return "";
-    },
-    handleOk(e: any) {
-      console.log(e);
-    },
-    showModal() {
-      // const modal = Modal.confirm({
-      //   title: "This is a notification message",
-      //   content: `Test.`,
-      //   maskClosable: true,
-      //   centered: true,
-      //   onCancel: () => {
-      //     modal.destroy();
-      //   },
-      //   onOk: () => {
-      //     modal.destroy();
-      //   },
-      // });
     },
     mapFilter(mode: number): IBeatmap[] {
       return this.beatmap_set.maps.filter((v) => v.mode == mode);
@@ -319,7 +326,7 @@ export default {
             this.$notify({
               title: "文件已存在",
               message: `${fileName} 已存在于 ${path}，将不会下载该铺面。`,
-              type: "warning"
+              type: "warning",
             });
           }
         })
@@ -339,6 +346,14 @@ export default {
     },
     approved(): string {
       return Approved[this.beatmap_set.approved].toUpperCase();
+    },
+    modes(): Set<GameMode> {
+      let _modes: Set<GameMode> = new Set();
+      this.beatmap_set.maps.forEach((v) => {
+        const _mode = v.mode;
+        _modes.add(_mode);
+      });
+      return _modes;
     },
     detailShow(): boolean {
       return this.mouseInDetailDiv || this.mouseInDiffsDiv;
@@ -364,11 +379,6 @@ export default {
 <style lang="less">
 @song-card-radius: 10px;
 @play-wrap-width: 120px;
-
-// 去掉Modal自带的两个按钮
-.ant-modal-confirm-btns {
-  display: none;
-}
 
 .song-card {
   max-width: 496px;
@@ -508,14 +518,6 @@ export default {
         align-items: center;
         width: 100%;
 
-        .gamemode-icon {
-          width: 20px;
-          height: 20px;
-          margin: 0 2px;
-          vertical-align: middle;
-
-        }
-
         .graveyard {
           background-color: hsl(200, 10%, 10%);
           color: hsl(200, 10%, 40%);
@@ -565,6 +567,11 @@ export default {
           flex-direction: row;
           justify-content: flex-start;
 
+          .diffs-mode-icon {
+            font-size: 16px;
+            margin-right: 1px;
+          }
+
           .diff-count {
             font-weight: 800;
           }
@@ -574,7 +581,6 @@ export default {
             flex-direction: row;
             justify-content: flex-start;
             .diff {
-              margin-top: 2px;
               width: 7px;
               height: 14px;
               border-radius: 14px;
@@ -641,14 +647,14 @@ export default {
     z-index: 4;
 
     .diff-details__inner {
-      display: flex;
-      flex-direction: column;
       margin-top: 10px;
-      padding: 10px 5px;
+      padding: 5px 5px;
       border-radius: 0 0 @song-card-radius @song-card-radius;
       background-color: hsla(200, 10%, 30%, 0.7);
       backdrop-filter: blur(5px);
       overflow: visible;
+      width: 100%;
+
       &::before,
       &::after {
         content: "";
@@ -668,28 +674,29 @@ export default {
         right: 0;
         clip-path: path("M10 0 A10 10 0 0 1 0 10 L0 11 L10 11 L10 0 Z");
       }
-      .diff-detail {
-        height: 15px;
-        font-size: 12px;
-        font-weight: 600;
-        align-items: center;
-        color: #fff;
-        margin: 1px;
+      .diff-details__mode {
+        display: flex;
+        flex-direction: column;
+        .diff-detail {
+          height: 15px;
+          font-size: 12px;
+          font-weight: 800;
+          align-items: center;
+          color: #fff;
+          margin: 1px;
 
-        .gamemode-icon {
-          width: 14px;
-          height: 14px;
-          margin-bottom: 2px;
-          vertical-align: middle;
-        }
+          .detail-popover-mode-icon {
+            font-size: 14px;
+          }
 
-        .stars {
-          padding: 0 6px;
-          color: hsl(200, 10%, 10%);
-          border-radius: 15px;
+          .stars {
+            padding: 0 6px;
+            color: hsl(200, 10%, 10%);
+            border-radius: 15px;
 
-          .fa-star {
-            width: 0.9em;
+            .fa-star {
+              width: 0.9em;
+            }
           }
         }
       }
