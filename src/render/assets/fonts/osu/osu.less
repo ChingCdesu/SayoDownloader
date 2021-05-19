@@ -1,0 +1,25 @@
+@font-face {
+    font-family: 'osu-mode';
+    src: url(osu.woff2);
+}
+
+.icon-osu {
+    font-family: osu-mode;
+    font-style: normal;
+}
+
+.icon-osu.mode-osu::before {
+    content: '\e800';
+}
+
+.icon-osu.mode-taiko::before {
+    content: '\e801';
+}
+
+.icon-osu.mode-catch::before {
+    content: '\e802';
+}
+
+.icon-osu.mode-mania::before {
+    content: '\e803';
+}
