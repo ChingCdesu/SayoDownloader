@@ -4,13 +4,13 @@
       <div class="left-cover">
         <img
           class="img-cover"
-          :src="`https://assets.ppy.sh/beatmaps/${this.beatmap_set.id}/covers/list@2x.jpg`"
+          :src="`https://assets.ppy.sh/beatmaps/${this.BeatmapSet.id}/covers/list@2x.jpg`"
         />
       </div>
       <div class="right-cover">
         <img
           class="img-cover"
-          :src="`https://assets.ppy.sh/beatmaps/${this.beatmap_set.id}/covers/card.jpg`"
+          :src="`https://assets.ppy.sh/beatmaps/${this.BeatmapSet.id}/covers/card.jpg`"
         />
       </div>
     </div>
@@ -24,7 +24,7 @@
           >作曲/歌手: {{ this.displayArtist }}</span
         >
         <span class="song-creator info-text"
-          >作图者: {{ this.beatmap_set.creator }}</span
+          >作图者: {{ this.BeatmapSet.creator }}</span
         >
         <el-space
           class="song-maps-inner"
@@ -124,6 +124,7 @@
     </el-collapse-transition>
     <el-dialog
       v-model="this.modalVisible"
+      width="75%"
       :modal="true"
       :show-close="false"
       :destroy-on-close="true"
@@ -132,69 +133,7 @@
       :center="true"
       custom-class="song-detail-modal"
     >
-      <el-tabs
-        class="song-detail-modal__modes"
-        style="width: 100%"
-        v-model="this.songDetailModalActiveMode"
-        @tab-click="this.tabClick"
-      >
-        <el-tab-pane
-          v-for="mode in this.modes"
-          :key="mode"
-          :lazy="true"
-          :name="mode"
-        >
-          <template #label>
-            <el-space :size="4" class="song-detail-modal__mode">
-              <span>{{ this.gameModeString(mode) }}</span>
-              <el-badge
-                :value="this.mapFilter(mode).length"
-                class="song-detail-modal__mode-count"
-              />
-            </el-space>
-          </template>
-          <el-space class="song-detail-modal__main" :size="5">
-            <div class="song-detail-modal__info-part1">
-              <div class="song-detail-modal__maps">
-                <span
-                  v-for="map in this.mapFilter(mode)"
-                  :key="map.id"
-                  class="song-detail-modal__mode-icon-outer"
-                >
-                  <i
-                    class="icon-osu song-detail-modal__mode-icon"
-                    :class="this.getModeIconClass(mode)"
-                    :style="{ color: this.diffColor(map.difficult) }"
-                  ></i
-                ></span>
-              </div>
-              <div class="song-detail-modal__approved">
-                <span>{{ this.approved }}</span>
-              </div>
-            </div>
-            <div class="song-detail-modal__info-part2">
-              <div class="song-detail-modal__info-part2-inner1">
-                <div class="song-detail-modal__diff-name">
-                  {{
-                    this.mapFilter(mode)[this.songDetailModalActiveDiffIndex]
-                      .name
-                  }}
-                </div>
-                <div class="song-detail-modal__title">
-                  {{ this.displayTitle }}
-                </div>
-                <div class="song-detail-modal__artist">
-                  {{ this.displayArtist }}
-                </div>
-                <div class="song-detail-modal__artist">
-                  作图者：{{ this.beatmap_set.creator }}
-                </div>
-              </div>
-              <div class="song-detail-modal__info-part2-inner2"></div>
-            </div>
-          </el-space>
-        </el-tab-pane>
-      </el-tabs>
+      <song-detail-modal :BeatmapSet="this.BeatmapSet" />
     </el-dialog>
   </div>
 </template>
@@ -206,6 +145,12 @@ import { GameMode, Approved } from "@src/common/enums/osu";
 import store from "@src/common/utils/store";
 import { IBeatmap } from "@src/common/interfaces/osu";
 import PlayerSingleton from "@src/common/utils/player";
+import SongDetailModal from "./SongDetailModal.vue";
+import {
+  diffColor,
+  getModeIconClass,
+  gameModeString,
+} from "@src/common/utils/osu";
 import {
   newDownloadFile,
   getDownloadPath,
@@ -213,25 +158,26 @@ import {
 
 export default {
   name: "SongCard",
+  components: {
+    SongDetailModal,
+  },
   props: {
-    beatmap_set: {
+    BeatmapSet: {
       type: Object as PropType<IBeatmapSet>,
       required: true,
     },
   },
+  setup(props) {
+    return {
+      BeatmapSet: props.BeatmapSet,
+      gameModeString,
+      getModeIconClass,
+      diffColor,
+    };
+  },
   data() {
     const player = PlayerSingleton.instance;
     return {
-      colors: [
-        "#4fbdfc",
-        "#65ff84",
-        "#adf94e",
-        "#f9a55f",
-        "#f9514e",
-        "#a067ff",
-      ],
-      diffs: [0, 2.0, 2.7, 4.0, 5.3, 6.5],
-      expertPurple: "#545ad6",
       diffspace: 1,
       modalVisible: false,
       mouseInDetailDiv: false,
@@ -243,125 +189,24 @@ export default {
     };
   },
   methods: {
-    HexToRgb(sColor: string): number[] {
-      let reg = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
-      sColor = sColor.toLowerCase();
-      if (sColor && reg.test(sColor)) {
-        if (sColor.length === 4) {
-          let sColorNew = "#";
-          for (let i = 1; i < 4; i += 1) {
-            sColorNew += sColor.slice(i, i + 1).concat(sColor.slice(i, i + 1));
-          }
-          sColor = sColorNew;
-        }
-        //处理六位的颜色值
-        let sColorChange = [];
-        for (let i = 1; i < 7; i += 2) {
-          sColorChange.push(parseInt("0x" + sColor.slice(i, i + 2)));
-        }
-        return sColorChange;
-      } else {
-        return [];
-      }
-    },
-    RgbToHex(rgb: string): string {
-      let _this = rgb;
-      let reg = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
-      if (/^(rgb|RGB)/.test(_this)) {
-        let aColor = _this.replace(/(?:\(|\)|rgb|RGB)*/g, "").split(",");
-        let strHex = "#";
-        for (let i = 0; i < aColor.length; i++) {
-          let hex = Number(aColor[i]).toString(16);
-          hex = hex.length < 2 ? 0 + "" + hex : hex; // 保证每个rgb的值为2位
-          strHex += hex;
-        }
-        if (strHex.length !== 7) {
-          strHex = _this;
-        }
-        return strHex;
-      } else if (reg.test(_this)) {
-        let aNum = _this.replace(/#/, "").split("");
-        if (aNum.length === 6) {
-          return _this;
-        } else if (aNum.length === 3) {
-          let numHex = "#";
-          for (let i = 0; i < aNum.length; i += 1) {
-            numHex += aNum[i] + aNum[i];
-          }
-          return numHex;
-        }
-      } else {
-        return _this;
-      }
-      return "";
-    },
-    gradientColor(
-      startColor: string,
-      endColor: string,
-      step: number,
-      index: number
-    ): string {
-      let startRGB = this.HexToRgb(startColor); //转换为rgb数组模式
-      let startR = startRGB[0];
-      let startG = startRGB[1];
-      let startB = startRGB[2];
-      let endRGB = this.HexToRgb(endColor);
-      let endR = endRGB[0];
-      let endG = endRGB[1];
-      let endB = endRGB[2];
-
-      let sR = (endR - startR) / step; //总差值
-      let sG = (endG - startG) / step;
-      let sB = (endB - startB) / step;
-
-      return this.RgbToHex(
-        "rgb(" +
-          Math.round(sR * index + startR) +
-          "," +
-          Math.round(sG * index + startG) +
-          "," +
-          Math.round(sB * index + startB) +
-          ")"
-      );
-    },
-    diffColor(diff: number): string {
-      if (diff > 6.5) {
-        return this.expertPurple;
-      } else if (diff < 0) {
-        return this.colors[0];
-      }
-      let index = 0;
-      while (diff > this.diffs[index]) index++;
-      const step = (this.diffs[index] - this.diffs[index - 1]) * 100;
-      const i = (diff - this.diffs[index - 1]) * 100;
-      return this.gradientColor(
-        this.colors[index - 1],
-        this.colors[index],
-        Math.round(step),
-        Math.round(i)
-      );
-    },
-    getModeIconClass(mode: GameMode) {
-      return "mode-" + GameMode[mode];
-    },
     mapFilter(mode: GameMode): IBeatmap[] {
-      return this.beatmap_set.maps.filter((v) => v.mode == mode);
+      return this.BeatmapSet.maps.filter((v) => v.mode == mode);
     },
     addSongAndPlay() {
-      if (this.beatmap_set.audio) {
-        const url = `https://dl.sayobot.cn/beatmaps/files/${this.beatmap_set.id}/${this.beatmap_set.audio}`;
+      if (this.BeatmapSet.audio) {
+        const url = `https://dl.sayobot.cn/beatmaps/files/${this.BeatmapSet.id}/${this.BeatmapSet.audio}`;
         const title = `${this.displayTitle.toString()} - ${this.displayArtist.toString()}`;
         const id = this.player.addAudioToPlaylist(
           url,
           title,
-          this.beatmap_set.id as number
+          this.BeatmapSet.id as number
         );
         this.player.play(id);
       }
     },
     async download() {
-      const url = `https://dl.sayobot.cn/beatmaps/download/full/${this.beatmap_set.id}`;
-      const fileName = `${this.beatmap_set.id} ${this.beatmap_set.title} - ${this.beatmap_set.artist}.osz`;
+      const url = `https://dl.sayobot.cn/beatmaps/download/full/${this.BeatmapSet.id}`;
+      const fileName = `${this.BeatmapSet.id} ${this.BeatmapSet.title} - ${this.BeatmapSet.artist}.osz`;
       const path = await getDownloadPath();
       newDownloadFile({
         url,
@@ -391,29 +236,18 @@ export default {
             type: "error",
           });
         });
-    },
-    gameModeString(mode: GameMode): string {
-      const prefix = mode === GameMode.osu ? "" : "osu!";
-      const suffix = mode === GameMode.osu ? "!" : "";
-      return prefix + GameMode[mode] + suffix;
-    },
-    tabClick() {
-      if (!this.songDetailModalActiveMode) {
-        const it = this.modes[Symbol.iterator]();
-        this.songDetailModalActiveMode = it.next().value;
-      }
-    },
+    }, 
   },
   computed: {
     approvedClass(): string {
-      return Approved[this.beatmap_set.approved] + " approved-status";
+      return Approved[this.BeatmapSet.approved] + " approved-status";
     },
     approved(): string {
-      return Approved[this.beatmap_set.approved].toUpperCase();
+      return Approved[this.BeatmapSet.approved].toUpperCase();
     },
     modes(): Set<GameMode> {
       let _modes: Set<GameMode> = new Set();
-      this.beatmap_set.maps.forEach((v) => {
+      this.BeatmapSet.maps.forEach((v) => {
         const _mode = v.mode;
         _modes.add(_mode);
       });
@@ -425,15 +259,15 @@ export default {
     displayTitle(): String {
       const uni = store.get("displayWithUnicode");
       let ret: String | undefined;
-      if (uni) ret = this.beatmap_set?.titleU || this.beatmap_set?.title;
-      else ret = this.beatmap_set?.title;
+      if (uni) ret = this.BeatmapSet?.titleU || this.BeatmapSet?.title;
+      else ret = this.BeatmapSet?.title;
       return ret || "";
     },
     displayArtist(): String {
       const uni = store.get("displayWithUnicode");
       let ret: String | undefined;
-      if (uni) ret = this.beatmap_set?.artistU || this.beatmap_set?.artist;
-      else ret = this.beatmap_set?.artist;
+      if (uni) ret = this.BeatmapSet?.artistU || this.BeatmapSet?.artist;
+      else ret = this.BeatmapSet?.artist;
       return ret || "";
     },
   },
@@ -799,16 +633,6 @@ export default {
     color: #fff;
     background-color: hsla(200, 10%, 20%, 0.7);
     backdrop-filter: blur(5px);
-  }
-
-  .song-detail-modal__mode {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    .song-detail-modal__mode-count {
-      display: flex;
-    }
   }
 }
 </style>

@@ -103,7 +103,7 @@
           class="sets-item"
           style="margin-right: 8px"
         >
-          <SongCard :beatmap_set="this.sets[(index - 1) * 2]" />
+          <SongCard :BeatmapSet="this.sets[(index - 1) * 2]" />
         </el-col>
         <el-col
           :xs="{ span: 11, offset: 0 }"
@@ -112,7 +112,7 @@
           class="sets-item"
           style="margin-left: 8px"
         >
-          <SongCard :beatmap_set="this.sets[(index - 1) * 2 + 1]" />
+          <SongCard :BeatmapSet="this.sets[(index - 1) * 2 + 1]" />
         </el-col>
       </el-row>
     </div>
@@ -165,6 +165,8 @@ interface IBeatmapFilter {
   bpm?: number_array_of_2;
   length?: number_array_of_2;
 }
+
+import { OsuConstant } from '@src/common/constant'
 
 export default {
   name: "home",
@@ -295,52 +297,13 @@ export default {
     return { sets, error, filter, onSearch, loadMore, keyword, autoload };
   },
   data() {
-    const modeOptions = [
-      { label: "std", value: 1 },
-      { label: "taiko", value: 2 },
-      { label: "ctb", value: 4 },
-      { label: "mania", value: 8 },
-    ];
-    const approvedOptions = [
-      { label: "Ranked & Approved", value: 1 },
-      { label: "Qualified", value: 2 },
-      { label: "Loved", value: 4 },
-      { label: "Pending & WIP", value: 8 },
-      { label: "Graveyard", value: 16 },
-    ];
-    const genreOptions = [
-      { label: "所有", value: 1 },
-      { label: "尚未指定", value: 2 },
-      { label: "电子游戏", value: 4 },
-      { label: "动漫", value: 8 },
-      { label: "摇滚", value: 16 },
-      { label: "流行乐", value: 32 },
-      { label: "其他", value: 64 },
-      { label: "新奇", value: 128 },
-      { label: "嘻哈", value: 256 },
-      { label: "电子", value: 1024 },
-    ];
-    const languageOptions = [
-      { label: "所有", value: 1 },
-      { label: "其他", value: 2 },
-      { label: "英语", value: 4 },
-      { label: "日语", value: 8 },
-      { label: "中文", value: 16 },
-      { label: "纯音乐", value: 32 },
-      { label: "韩语", value: 64 },
-      { label: "法语", value: 128 },
-      { label: "德语", value: 256 },
-      { label: "瑞典语", value: 512 },
-      { label: "西班牙语", value: 1024 },
-      { label: "意大利语", value: 2048 },
-    ];
     const filterBtnClass = "filter-checkbox-btn";
     return {
       filterBtnClass,
-      modeOptions,
-      approvedOptions,
-      genreOptions,
-      languageOptions,
+      modeOptions: OsuConstant.mode,
+      approvedOptions: OsuConstant.approved,
+      genreOptions: OsuConstant.genre,
+      languageOptions: OsuConstant.language,
     };
   },
 };
