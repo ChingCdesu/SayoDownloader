@@ -103,9 +103,7 @@
               :size="2"
               alignment="baseline"
               :key="map.id"
-              v-for="map in this.beatmap_set.maps.filter(
-                (m) => m.mode === mode
-              )"
+              v-for="map in this.mapFilter(mode)"
             >
               <i
                 class="icon-osu detail-popover-mode-icon"
@@ -134,26 +132,69 @@
       :center="true"
       custom-class="song-detail-modal"
     >
-      <div class="song-detail-modal__header">
-        <div class="song-detail-modal__title">铺面列表</div>
-        <el-space class="song-detail-modal__modes" :size="6">
-          <div
-            class="song-detail-modal__mode"
-            v-for="mode in this.modes"
-            :key="mode"
-          >
-            <span>{{ this.gameModeString(mode) }}</span>
-            <el-badge
-              :value="
-                this.beatmap_set.maps.filter((m) => m.mode === mode).length
-              "
-              class="song-detail-modal__mode-count"
-            />
-          </div>
-        </el-space>
-      </div>
-      <div class="song-detail-modal__body"></div>
-      <div class="song-detail-modal__footer"></div>
+      <el-tabs
+        class="song-detail-modal__modes"
+        style="width: 100%"
+        v-model="this.songDetailModalActiveMode"
+        @tab-click="this.tabClick"
+      >
+        <el-tab-pane
+          v-for="mode in this.modes"
+          :key="mode"
+          :lazy="true"
+          :name="mode"
+        >
+          <template #label>
+            <el-space :size="4" class="song-detail-modal__mode">
+              <span>{{ this.gameModeString(mode) }}</span>
+              <el-badge
+                :value="this.mapFilter(mode).length"
+                class="song-detail-modal__mode-count"
+              />
+            </el-space>
+          </template>
+          <el-space class="song-detail-modal__main" :size="5">
+            <div class="song-detail-modal__info-part1">
+              <div class="song-detail-modal__maps">
+                <span
+                  v-for="map in this.mapFilter(mode)"
+                  :key="map.id"
+                  class="song-detail-modal__mode-icon-outer"
+                >
+                  <i
+                    class="icon-osu song-detail-modal__mode-icon"
+                    :class="this.getModeIconClass(mode)"
+                    :style="{ color: this.diffColor(map.difficult) }"
+                  ></i
+                ></span>
+              </div>
+              <div class="song-detail-modal__approved">
+                <span>{{ this.approved }}</span>
+              </div>
+            </div>
+            <div class="song-detail-modal__info-part2">
+              <div class="song-detail-modal__info-part2-inner1">
+                <div class="song-detail-modal__diff-name">
+                  {{
+                    this.mapFilter(mode)[this.songDetailModalActiveDiffIndex]
+                      .name
+                  }}
+                </div>
+                <div class="song-detail-modal__title">
+                  {{ this.displayTitle }}
+                </div>
+                <div class="song-detail-modal__artist">
+                  {{ this.displayArtist }}
+                </div>
+                <div class="song-detail-modal__artist">
+                  作图者：{{ this.beatmap_set.creator }}
+                </div>
+              </div>
+              <div class="song-detail-modal__info-part2-inner2"></div>
+            </div>
+          </el-space>
+        </el-tab-pane>
+      </el-tabs>
     </el-dialog>
   </div>
 </template>
@@ -197,6 +238,8 @@ export default {
       mouseInDiffsDiv: false,
       player,
       downloadTooltip: "下载",
+      songDetailModalActiveMode: null,
+      songDetailModalActiveDiffIndex: 0,
     };
   },
   methods: {
@@ -299,18 +342,9 @@ export default {
       );
     },
     getModeIconClass(mode: GameMode) {
-      switch (mode) {
-        case GameMode.osu:
-          return "mode-osu";
-        case GameMode.taiko:
-          return "mode-taiko";
-        case GameMode.catch:
-          return "mode-catch";
-        case GameMode.mania:
-          return "mode-mania";
-      }
+      return "mode-" + GameMode[mode];
     },
-    mapFilter(mode: number): IBeatmap[] {
+    mapFilter(mode: GameMode): IBeatmap[] {
       return this.beatmap_set.maps.filter((v) => v.mode == mode);
     },
     addSongAndPlay() {
@@ -359,8 +393,15 @@ export default {
         });
     },
     gameModeString(mode: GameMode): string {
-      const prefix = mode === GameMode.osu ? "" : "osu!"
-      return prefix + GameMode[mode];
+      const prefix = mode === GameMode.osu ? "" : "osu!";
+      const suffix = mode === GameMode.osu ? "!" : "";
+      return prefix + GameMode[mode] + suffix;
+    },
+    tabClick() {
+      if (!this.songDetailModalActiveMode) {
+        const it = this.modes[Symbol.iterator]();
+        this.songDetailModalActiveMode = it.next().value;
+      }
     },
   },
   computed: {
@@ -703,7 +744,7 @@ export default {
         .diff-detail {
           height: 15px;
           font-size: 12px;
-          font-weight: 800;
+          font-weight: 600;
           align-items: center;
           color: #fff;
           margin: 1px;
@@ -756,24 +797,17 @@ export default {
 
   .el-dialog__body {
     color: #fff;
-    background-color: hsla(200, 10%, 20%, .7);
+    background-color: hsla(200, 10%, 20%, 0.7);
     backdrop-filter: blur(5px);
   }
 
-  .song-detail-modal__header {
+  .song-detail-modal__mode {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-
-    .song-detail-modal__mode {
+    .song-detail-modal__mode-count {
       display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      .song-detail-modal__mode-count {
-        display: flex;
-      }
     }
   }
 }
