@@ -134,7 +134,26 @@
       :center="true"
       custom-class="song-detail-modal"
     >
-    
+      <div class="song-detail-modal__header">
+        <div class="song-detail-modal__title">铺面列表</div>
+        <el-space class="song-detail-modal__modes" :size="6">
+          <div
+            class="song-detail-modal__mode"
+            v-for="mode in this.modes"
+            :key="mode"
+          >
+            <span>{{ this.gameModeString(mode) }}</span>
+            <el-badge
+              :value="
+                this.beatmap_set.maps.filter((m) => m.mode === mode).length
+              "
+              class="song-detail-modal__mode-count"
+            />
+          </div>
+        </el-space>
+      </div>
+      <div class="song-detail-modal__body"></div>
+      <div class="song-detail-modal__footer"></div>
     </el-dialog>
   </div>
 </template>
@@ -338,6 +357,10 @@ export default {
             type: "error",
           });
         });
+    },
+    gameModeString(mode: GameMode): string {
+      const prefix = mode === GameMode.osu ? "" : "osu!"
+      return prefix + GameMode[mode];
     },
   },
   computed: {
@@ -719,6 +742,38 @@ export default {
 
     .play {
       opacity: 1;
+    }
+  }
+}
+
+.song-detail-modal {
+  background: none;
+  border-radius: @song-card-radius;
+  overflow: hidden;
+  .el-dialog__header {
+    display: none;
+  }
+
+  .el-dialog__body {
+    color: #fff;
+    background-color: hsla(200, 10%, 20%, .7);
+    backdrop-filter: blur(5px);
+  }
+
+  .song-detail-modal__header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .song-detail-modal__mode {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      .song-detail-modal__mode-count {
+        display: flex;
+      }
     }
   }
 }
