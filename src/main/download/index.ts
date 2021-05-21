@@ -128,7 +128,7 @@ export const listenerDownload = async (
             downloadItem.fileName = path.basename(saveFilePath)
             renameFile(downloadItem.path, saveFilePath)
             downloadItem.path = saveFilePath
-            
+
             app.dock.downloadFinished(downloadItem.path)
         }
 
@@ -331,13 +331,13 @@ const listenerEvent = () => {
 export const registerDownloadService = (window: BrowserWindow | null): void => {
     win = window
     listenerEvent()
-    window?.on('close', () => {
+    const onClose = () => {
         // 窗口关闭时，将下载中或中断的项暂停，并删除本地缓存
         downloadItemData.forEach(item => {
             if (['progressing', 'interrupted'].includes(item.state)) {
                 item._sourceItem?.pause()
                 item.paused = true
-                removeFile(item.path)
+                // removeFile(item.path)
             }
         })
 
@@ -349,5 +349,23 @@ export const registerDownloadService = (window: BrowserWindow | null): void => {
         downloadCompletedIds = []
         setTaskbar(downloadItemData, downloadCompletedIds, -1, win)
         win = null
+    }
+    window?.on('close', (event) => {
+        if (downloadItemData.filter(item =>
+            item.state === 'progressing' || item.state === 'interrupted'
+        ).length > 0) {
+            const result = dialog.showMessageBoxSync({
+                type: 'info',
+                title: '确定关闭?',
+                message: '还有下载在进行，确定退出吗？',
+                buttons: ['确定', '取消']
+            })
+            if (result === 0) {
+                onClose()
+            } else {
+                event.preventDefault();
+            }
+        }
+
     })
 }
