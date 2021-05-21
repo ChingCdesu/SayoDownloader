@@ -35,7 +35,7 @@ export const ipcRendererInvoke = <T>(eventName: IPCEventName, ...args: any[]): P
  * 打开文件
  * @param path - 路径
  */
-export const openFile = (path: string): Promise<string> => ipcRendererInvoke('openFile', path)
+export const openFile = (path: string): Promise<boolean> => ipcRendererInvoke('openFile', path)
 
 /**
  * 打开下载管理器
@@ -80,7 +80,6 @@ export const openFileInFolder = (path: string): Promise<boolean> =>
 
 /**
  * 获取下载数据
- * @param page - 分页
  */
 export const getDownloadData = (): Promise<IDownloadFile[]> =>
     ipcRendererInvoke('getDownloadData')

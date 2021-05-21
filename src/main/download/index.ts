@@ -1,16 +1,18 @@
-import {app, BrowserWindow, session, dialog, WebContents, DownloadItem, webContents} from 'electron'
+import { app, BrowserWindow, session, dialog, WebContents, DownloadItem, webContents } from 'electron'
 
-import {IDownloadFile, INewDownloadFile, IPagination} from '@src/common/interfaces/download'
+import { IDownloadFile, INewDownloadFile, IPagination } from '@src/common/interfaces/download'
 import {
+    getFileExt,
     getFileName,
     isExistFile,
     openFile,
     openFileInFolder,
     pathJoin,
     removeFile,
+    renameFile,
     uuidV4,
 } from './util'
-import {ipcMainHandle} from './ipc-main'
+import { ipcMainHandle } from './ipc-main'
 import {
     addDownloadItem,
     deleteSourceItem,
@@ -25,6 +27,7 @@ import {
     setTaskbar,
     updateDownloadItem,
 } from './helper'
+import path from 'path'
 
 let win: BrowserWindow | null
 let newDownloadItem: INewDownloadFile | null
@@ -47,25 +50,6 @@ const tempDownloadItemIds: string[] = [] // 下载中的 id
 
 //   win.on('ready-to-show', () => {
 //     win?.show()
-//   })
-
-//   win.on('close', () => {
-//     // 窗口关闭时，将下载中或中断的项暂停，并删除本地缓存
-//     downloadItemData.forEach(item => {
-//       if (['progressing', 'interrupted'].includes(item.state)) {
-//         item._sourceItem?.pause()
-//         item.paused = true
-//         removeFile(item.path)
-//       }
-//     })
-
-//     setDownloadStore(downloadItemData)
-
-//     // 清除全局数据
-//     downloadItemData = []
-//     downloadCompletedIds = []
-//     setTaskbar(downloadItemData, downloadCompletedIds, -1, win)
-//     win = null
 //   })
 // }
 
@@ -95,7 +79,7 @@ export const listenerDownload = async (
     setTaskbar(downloadItemData, downloadCompletedIds, -1, win)
 
     // 新下载任务创建完成，渲染进程监听该事件，添加到下载管理器列表
-    webContents.send('newDownloadItem', {...downloadItem, _sourceItem: null})
+    webContents.send('newDownloadItem', { ...downloadItem, _sourceItem: null })
 
     // 更新下载
     item.on('updated', (e, state) => {
@@ -113,7 +97,7 @@ export const listenerDownload = async (
         // 更新任务栏进度
         win?.setProgressBar(bytes.receivedBytes / bytes.totalBytes)
         // 通知渲染进程，更新下载状态
-        webContents.send('downloadItemUpdate', {...downloadItem, _sourceItem: null})
+        webContents.send('downloadItemUpdate', { ...downloadItem, _sourceItem: null })
     })
 
     // 下载完成
@@ -123,17 +107,34 @@ export const listenerDownload = async (
 
         if (state !== 'cancelled') {
             downloadCompletedIds.push(downloadItem.id)
+        } else {
+            removeFile(downloadItem.path)
         }
 
         setTaskbar(downloadItemData, downloadCompletedIds, 0, win)
         // 下载成功
         if (state === 'completed' && process.platform === 'darwin') {
+            let saveFilePath = downloadItem.path.substr(0, downloadItem.path.length - 9)
+            let index = 0
+            const ext = getFileExt(saveFilePath)
+            const fileNameWithoutExt = path.basename(saveFilePath, ext)
+            const p = path.dirname(saveFilePath)
+            while (isExistFile(saveFilePath)) {
+                if (index !== 0) {
+                    saveFilePath = path.join(p, `${fileNameWithoutExt} (${index})${ext}`)
+                }
+                ++index
+            }
+            downloadItem.fileName = path.basename(saveFilePath)
+            renameFile(downloadItem.path, saveFilePath)
+            downloadItem.path = saveFilePath
+            
             app.dock.downloadFinished(downloadItem.path)
         }
 
         setDownloadStore(downloadItemData)
         // 通知渲染进程，更新下载状态
-        webContents.send('downloadItemDone', {...downloadItem, _sourceItem: null})
+        webContents.send('downloadItemDone', { ...downloadItem, _sourceItem: null })
     })
 }
 
@@ -169,7 +170,7 @@ const handleDownloadData = () => {
 const openFileDialog = async (oldPath: string = app.getPath('downloads')) => {
     if (!win) return oldPath
 
-    const {canceled, filePaths} = await dialog.showOpenDialog(win, {
+    const { canceled, filePaths } = await dialog.showOpenDialog(win, {
         title: '选择保存位置',
         properties: ['openDirectory', 'createDirectory'],
         defaultPath: oldPath,
@@ -199,11 +200,11 @@ const retryDownloadFile = (data: IDownloadFile): boolean => {
  * @param newItem - 新下载项
  */
 const downloadFile = (newItem: INewDownloadFile) => {
-    const {url, fileName, path: savePath} = newItem
+    const { url, fileName, path: savePath } = newItem
     const newFileName = getFileName(fileName ?? '', url) // 处理文件名
 
     // 处理保存路径
-    const downloadPath = pathJoin(savePath, newFileName)
+    const downloadPath = pathJoin(savePath, newFileName) + '.download'
     // 查找下载记录中是否存在历史下载
     const existItem = isExistItem(url, downloadItemData)
     newItem.fileName = newFileName
@@ -212,11 +213,11 @@ const downloadFile = (newItem: INewDownloadFile) => {
     // 判断是否存在
     if (isExistFile(downloadPath)) {
         const id = existItem?.id || ''
-        return {id, ...newItem}
+        return { id, ...newItem }
     }
 
     if (existItem) {
-        retryDownloadFile({...existItem, ...newItem})
+        retryDownloadFile({ ...existItem, ...newItem })
         return null
     }
 
@@ -330,4 +331,23 @@ const listenerEvent = () => {
 export const registerDownloadService = (window: BrowserWindow | null): void => {
     win = window
     listenerEvent()
+    window?.on('close', () => {
+        // 窗口关闭时，将下载中或中断的项暂停，并删除本地缓存
+        downloadItemData.forEach(item => {
+            if (['progressing', 'interrupted'].includes(item.state)) {
+                item._sourceItem?.pause()
+                item.paused = true
+                removeFile(item.path)
+            }
+        })
+
+        const data = deleteSourceItem(downloadItemData)
+        setDownloadStore(data)
+
+        // 清除全局数据
+        downloadItemData = []
+        downloadCompletedIds = []
+        setTaskbar(downloadItemData, downloadCompletedIds, -1, win)
+        win = null
+    })
 }

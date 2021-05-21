@@ -4,9 +4,9 @@ import fs from 'fs'
 import path from 'path'
 
 export const uuidV4 = function () {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
   });
 }
 
@@ -71,6 +71,16 @@ export const removeFile = (path: string): void => {
   if (!isExistFile(path)) return
 
   fs.unlinkSync(path)
+}
+
+/**
+ * 重命名文件
+ * @param path - 旧文件路径
+ * @param newPath - 新文件路径
+ */
+export const renameFile = (path: string, newPath: string): void => {
+  if (!isExistFile(path)) return
+  fs.renameSync(path, newPath)
 }
 
 /**

@@ -10,7 +10,7 @@ export const apiData2IBeatmapSet = (data: IApiBeatmapSet): IBeatmapSet => {
         artist: data.artist,
         artistU: data.artistU,
         approved: data.approved,
-        tags: data.tags.split(' '),
+        tags: data.tags.split(' ').filter(t => t.length !== 0),
         sources: data.source.split(' '),
         language: data.language,
         genre: data.genre,

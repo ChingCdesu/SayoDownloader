@@ -33,7 +33,7 @@
             :style="{ color: this.diffColor(map.difficult) }"
         /></el-tooltip>
       </template>
-      <div style="color: var(--song-detail-modal__active-color)">
+      <div class="map-version-text">
         {{ map.name }}
       </div>
       <div class="display-title">{{ this.displayTitle }}</div>
@@ -120,10 +120,10 @@
   </el-tabs>
   <div class="song-detail-modal__buttons">
     <el-tooltip content="下载">
-      <el-button circle icon="el-icon-download" @click="this.download"/>
+      <el-button circle icon="el-icon-download" @click="this.download" />
     </el-tooltip>
     <el-tooltip content="添加到播放列表">
-      <el-button circle icon="el-icon-plus" @click="this.addSong"/>
+      <el-button circle icon="el-icon-plus" @click="this.addSong" />
     </el-tooltip>
   </div>
 </template>
@@ -182,7 +182,7 @@ export default {
   },
   methods: {
     addSong() {
-      const player = PlayerSingleton.instance
+      const player = PlayerSingleton.instance;
       if (this.BeatmapSet.audio) {
         const url = `https://dl.sayobot.cn/beatmaps/files/${this.BeatmapSet.id}/${this.BeatmapSet.audio}`;
         const title = `${this.displayTitle.toString()} - ${this.displayArtist.toString()}`;
@@ -213,8 +213,8 @@ export default {
           } else {
             // @ts-ignore
             this.$notify({
-              title: "文件已存在",
-              message: `${fileName} 已存在于 ${path}，将不会下载该铺面。`,
+              title: "文件存在于下载队列",
+              message: `${fileName} 正在下载中。`,
               type: "warning",
             });
           }
@@ -223,18 +223,17 @@ export default {
           // @ts-ignore
           this.$notify({
             title: "出现错误",
-            message: `不会下载该文件。原因是：${err}。`,
+            message: `将不会下载该文件。原因是：${err}。`,
             type: "error",
           });
         });
-    }, 
+    },
     mapFilter(mode: GameMode): IBeatmap[] {
       return this.BeatmapSet.maps.filter((v) => v.mode == mode);
     },
     activeChanged(tab: any) {
       const sid = Number(tab.props.name);
       const map = this.BeatmapSet.maps.find((m) => m.id === sid);
-      console.log(map);
       const color = this.diffColor(map?.difficult as number);
       document.body.style.setProperty(
         "--song-detail-modal__active-color",
@@ -306,6 +305,11 @@ export default {
     background-color: var(--song-detail-modal__active-color);
     transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
+  .map-version-text {
+    color: var(--song-detail-modal__active-color);
+    mix-blend-mode: lighten;
+    
+  }
   .display-title,
   .display-artist {
     text-shadow: 0 1px 3px rgb(0 0 0 / 75%);
@@ -334,6 +338,9 @@ export default {
         margin-right: 5px;
         margin-top: 5px;
         border: 1px solid hsl(333, 90%, 80%);
+        height: 20px;
+        line-height: 18px;
+        padding: 0 3px;
       }
     }
     .info-right {
@@ -391,15 +398,9 @@ export default {
 }
 .song-detail-modal__buttons {
   margin-top: 20px;
+  text-align: right;
   .el-button {
     font-size: 18px;
-  }
-}
-
-.difficuly-tooltip {
-  &.el-popper,
-  .el-popper__arrow::before {
-    background: hsl(200, 10%, 30%) !important;
   }
 }
 </style>

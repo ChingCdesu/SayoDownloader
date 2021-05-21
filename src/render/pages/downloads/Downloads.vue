@@ -22,11 +22,21 @@
             class="progress-bar"
             v-if="item.paused === false && item.state === 'progressing'"
           >
-            <el-progress :percentage="item.progress * 100" :format="this.formatPercentage" />
+            <el-progress
+              :percentage="item.progress * 100"
+              :format="this.formatPercentage"
+            />
           </div>
-          <el-space direction="horizontal" size="large" style="display: flex; font-size: 14px;" alignment="center" prefix-cls="w-auto">
+          <el-space
+            direction="horizontal"
+            size="large"
+            style="display: flex; font-size: 14px"
+            alignment="center"
+            prefix-cls="w-auto"
+          >
             <div class="progress">
-              {{ this.byteUnited(item.receivedBytes) }} / {{ this.byteUnited(item.totalBytes) }}
+              {{ this.byteUnited(item.receivedBytes) }} /
+              {{ this.byteUnited(item.totalBytes) }}
             </div>
             <div class="status">
               {{ this.displayStatus(item) }}
@@ -181,11 +191,27 @@ export default {
       const _item = cloneDeep(item);
       pauseOrResume(_item);
     },
-    openFile(item: IDownloadFile) {
-      openFile(item.path);
+    async openFile(item: IDownloadFile) {
+      const success = await openFile(item.path);
+      if (!success) {
+        // @ts-ignore
+        this.$notify({
+          title: "文件不存在",
+          message: `${item.path} 被移动或被删除。`,
+          type: "warning",
+        });
+      }
     },
-    openFolder(item: IDownloadFile) {
-      openFileInFolder(item.path);
+    async openFolder(item: IDownloadFile) {
+      const success = await openFileInFolder(item.path);
+      if (!success) {
+        // @ts-ignore
+        this.$notify({
+          title: "文件不存在",
+          message: `${item.path} 被移动或被删除。`,
+          type: "warning",
+        });
+      }
     },
     async removeDownloadItem(item: IDownloadFile, index: number) {
       let _item = cloneDeep(item);

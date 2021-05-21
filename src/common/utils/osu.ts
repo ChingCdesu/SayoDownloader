@@ -9,7 +9,7 @@ const colors = [
   "#a067ff",
 ]
 const diffs = [0, 2.0, 2.7, 4.0, 5.3, 6.5]
-const expertPurple = "#545ad6"
+const expertPurple = "#937eff"
 
 const HexToRgb = (sColor: string): number[] => {
   let reg = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;

@@ -6,11 +6,14 @@ import { app, session } from 'electron'
 import { Main, registerDownloadService } from './window'
 import dotenv from 'dotenv'
 import store from '@src/common/utils/store';
+import { version } from '@src/common/constant'
+
 
 dotenv.config({ path: join(__dirname, '../../.env') })
 
 function init() {
   const mainWin = new Main()
+  store.set('phase', version)
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
     details.requestHeaders['User-Agent'] = `SayoDownloader v${store.get('phase')} powered by Electron`;
     callback({ cancel: false, requestHeaders: details.requestHeaders });

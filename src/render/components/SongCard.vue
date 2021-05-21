@@ -134,6 +134,12 @@
       custom-class="song-detail-modal"
     >
       <song-detail-modal :BeatmapSet="this.BeatmapSet" />
+      <div
+        class="modal-background"
+        :style="{
+          'background-image': `url(https://a.sayobot.cn/beatmaps/${this.BeatmapSet.id}/covers/cover.webp)`,
+        }"
+      ></div>
     </el-dialog>
   </div>
 </template>
@@ -222,8 +228,8 @@ export default {
           } else {
             // @ts-ignore
             this.$notify({
-              title: "文件已存在",
-              message: `${fileName} 已存在于 ${path}，将不会下载该铺面。`,
+              title: "文件存在于下载队列",
+              message: `${fileName} 正在下载中。`,
               type: "warning",
             });
           }
@@ -232,11 +238,11 @@ export default {
           // @ts-ignore
           this.$notify({
             title: "出现错误",
-            message: `不会下载该文件。原因是：${err}。`,
+            message: `将不会下载该文件。原因是：${err}。`,
             type: "error",
           });
         });
-    }, 
+    },
   },
   computed: {
     approvedClass(): string {
@@ -625,6 +631,7 @@ export default {
   background: none;
   border-radius: @song-card-radius;
   overflow: hidden;
+  box-shadow: 0 0 10px #fff;
   .el-dialog__header {
     display: none;
   }
@@ -633,6 +640,20 @@ export default {
     color: #fff;
     background-color: hsla(200, 10%, 20%, 0.7);
     backdrop-filter: blur(5px);
+  }
+
+  .modal-background {
+    pointer-events: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: .2;
+    filter: blur(5px);
   }
 }
 </style>
