@@ -34,7 +34,7 @@ body {
   font-family: Torus, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   font-variant: tabular-nums;
   line-height: 1.5715;
-  background-color: #fff;
+  background-color: hsl(200, 10%, 15%);
   font-feature-settings: 'tnum';
 }
 
@@ -115,5 +115,22 @@ body {
   }
   .el-notification__closeBtn{
     color: rgba(255, 255, 255, .7);
+  }
+}
+
+.el-input {
+  .el-input__inner {
+    background-color: hsl(200, 10%, 30%);
+    border: 1px solid hsl(200, 10%, 20%);
+    color: #fff;
+    transition: all cubic-bezier(0.645, 0.045, 0.355, 1) 0.2s;
+    font-family: Torus, sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    &:focus,
+    &:hover {
+      border: 1px solid hsl(200, 40%, 80%);
+      box-shadow: 0 0 10px hsl(200, 40%, 80%);
+    }
   }
 }

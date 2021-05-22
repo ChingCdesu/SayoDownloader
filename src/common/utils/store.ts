@@ -5,7 +5,9 @@ const store = new Store({
     name: 'store',
     defaults: {
         defaultDownloadPath: app?.getPath('downloads'),
-        displayWithUnicode: false
+        displayWithUnicode: false,
+        openDownloaded: false,
+        oszVersion: 'full'
     },
 })
 export default store

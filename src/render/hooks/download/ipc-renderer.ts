@@ -6,7 +6,6 @@ import {
     IPagination,
     IPCEventName,
 } from '@src/common/interfaces/download'
-import * as electron from 'electron';
 
 /**
  * 添加 ipc 调用监听事件

@@ -211,7 +211,7 @@ export default {
       }
     },
     async download() {
-      const url = `https://dl.sayobot.cn/beatmaps/download/full/${this.BeatmapSet.id}`;
+      const url = `https://dl.sayobot.cn/beatmaps/download/${store.get('oszVersion')}/${this.BeatmapSet.id}`;
       const fileName = `${this.BeatmapSet.id} ${this.BeatmapSet.title} - ${this.BeatmapSet.artist}.osz`;
       const path = await getDownloadPath();
       newDownloadFile({

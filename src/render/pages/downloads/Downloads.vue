@@ -7,10 +7,8 @@
         :key="index"
         class="download-item"
         :style="{
-          '--background': `url('https://a.sayobot.cn/beatmaps/${this.getQuerySid(
-            item.url
-          )}/covers/cover.webp')`,
-        }"
+          '--background': 
+          `url('https://a.sayobot.cn/beatmaps/${this.getQuerySid(item.url)}/covers/cover.webp')`}"
       >
         <font-awesome-icon
           :icon="['far', 'file-archive']"
@@ -240,7 +238,6 @@ export default {
 <style lang="less">
 .download-page {
   color: #fff;
-  background-color: hsl(200, 10%, 15%);
   min-height: 100vh;
   padding: 16px 24px;
 

@@ -312,11 +312,10 @@ export default {
 <style lang="less">
 .home {
   min-height: 100vh;
-  background-color: hsl(200, 10%, 15%);
   padding: 10px 8px;
 
   .beatmap-filter {
-    padding: 15px 5px 15px 5px;
+    padding: 6px 16px;
     position: relative;
     margin-bottom: 10px;
 
@@ -331,23 +330,6 @@ export default {
       background-size: cover;
       opacity: 0.5;
       filter: blur(5px);
-    }
-
-    .filter-search-input {
-      .el-input__inner {
-        background-color: hsl(200, 10%, 30%);
-        border: 1px solid hsl(200, 10%, 20%);
-        color: #fff;
-        transition: all cubic-bezier(0.645, 0.045, 0.355, 1) 0.2s;
-        font-family: Torus, sans-serif;
-        font-weight: 600;
-        font-size: 18px;
-        &:focus,
-        &:hover {
-          border: 1px solid hsl(200, 40%, 80%);
-          box-shadow: 0 0 10px hsl(200, 40%, 80%);
-        }
-      }
     }
 
     .conditions {
