@@ -7,8 +7,10 @@
         :key="index"
         class="download-item"
         :style="{
-          '--background': 
-          `url('https://a.sayobot.cn/beatmaps/${this.getQuerySid(item.url)}/covers/cover.webp')`}"
+          '--background': `url('https://a.sayobot.cn/beatmaps/${this.getQuerySid(
+            item.url
+          )}/covers/cover.webp')`,
+        }"
       >
         <font-awesome-icon
           :icon="['far', 'file-archive']"
@@ -106,6 +108,7 @@ import {
 import { onMounted, ref, Ref } from "vue";
 import { URL } from "@cliqz/url-parser";
 import { cloneDeep } from "lodash";
+import store from "@src/common/utils/store";
 
 export default {
   name: "downloads",
@@ -139,6 +142,18 @@ export default {
         dh.value[index] = item;
       }
       bytes.value = getDownloadBytes();
+      if (item.state === "completed" && store.get("openDownloaded")) {
+        openFile(item.path).then((success) => {
+          if (!success) {
+            // @ts-ignore
+            this.$notify({
+              title: "文件不存在",
+              message: `${item.path} 被移动或被删除。`,
+              type: "warning",
+            });
+          }
+        });
+      }
     };
     // add listeners
     listenerNewDownloadItem(handleUpdate);
@@ -286,7 +301,6 @@ export default {
       flex: 1;
       margin: 0 12px;
       text-align: start;
-      font-family: Torus, sans-serif;
 
       .file-name {
         font-weight: 800;

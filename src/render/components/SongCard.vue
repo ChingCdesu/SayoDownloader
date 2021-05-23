@@ -213,7 +213,7 @@ export default {
     async download() {
       const url = `https://dl.sayobot.cn/beatmaps/download/${store.get('oszVersion')}/${this.BeatmapSet.id}`;
       const fileName = `${this.BeatmapSet.id} ${this.BeatmapSet.title} - ${this.BeatmapSet.artist}.osz`;
-      const path = await getDownloadPath();
+      const path = store.get('defaultDownloadPath');
       newDownloadFile({
         url,
         fileName,
@@ -380,7 +380,6 @@ export default {
       flex: 1;
       flex-direction: column;
       color: #fff;
-      font-family: Torus;
       align-items: flex-start;
       text-align: start;
       justify-content: space-between;
@@ -395,20 +394,23 @@ export default {
       width: calc(100% - 120px - 10px);
 
       .info-text {
-        font-weight: 600;
+        font-weight: 500;;
         overflow: hidden;
         text-overflow: ellipsis;
         width: calc(100% - 20px);
       }
 
+      .song-artist, .song-title {
+        font-family: Torus, KiwiMaru, sans-serif;
+        text-shadow: 0 1px 3px rgb(0 0 0 / 75%);
+      }
+
       .song-title {
         font-size: 16px;
-        text-shadow: 0 1px 3px rgb(0 0 0 / 75%);
       }
 
       .song-artist {
         font-size: 14px;
-        text-shadow: 0 1px 3px rgb(0 0 0 / 75%);
       }
 
       .song-creator {
@@ -459,7 +461,6 @@ export default {
 
         .approved-status {
           border-radius: 99px;
-          font-family: Torus;
           font-weight: 800;
           font-size: 12px;
           line-height: 16px;
@@ -584,7 +585,7 @@ export default {
         .diff-detail {
           height: 15px;
           font-size: 12px;
-          font-weight: 600;
+          font-weight: 500;;
           align-items: center;
           color: #fff;
           margin: 1px;

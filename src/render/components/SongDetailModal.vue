@@ -196,7 +196,7 @@ export default {
     async download() {
       const url = `https://dl.sayobot.cn/beatmaps/download/${store.get('oszVersion')}/${this.BeatmapSet.id}`;
       const fileName = `${this.BeatmapSet.id} ${this.BeatmapSet.title} - ${this.BeatmapSet.artist}.osz`;
-      const path = await getDownloadPath();
+      const path = store.get('defaultDownloadPath');
       newDownloadFile({
         url,
         fileName,
@@ -308,16 +308,17 @@ export default {
   .map-version-text {
     color: var(--song-detail-modal__active-color);
     mix-blend-mode: lighten;
-    
+    font-weight: 500;
   }
   .display-title,
   .display-artist {
     text-shadow: 0 1px 3px rgb(0 0 0 / 75%);
+    font-family: Torus, KiwiMaru, sans-serif;
   }
 
   .display-title {
     font-size: 30px;
-    font-weight: 600;
+    font-weight: 500;;
     line-height: 1;
   }
 
@@ -334,6 +335,7 @@ export default {
       flex: 1;
       .tags .el-tag {
         color: #fff;
+        font-family: Torus, KiwiMaru, sans-serif;
         background-color: hsla(333, 90%, 70%, 0.6);
         margin-right: 5px;
         margin-top: 5px;

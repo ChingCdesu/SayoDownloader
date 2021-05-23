@@ -249,7 +249,6 @@ export default {
   background-color: hsla(200, 10%, 20%, 0.7);
   backdrop-filter: blur(5px);
   color: #fff;
-  font-family: Torus, sans-serif;
   border: none;
   padding: 0;
   overflow: hidden;
@@ -260,8 +259,9 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    font-family: Torus, KiwiMaru, sans-serif;
     &.isplaying {
-      background-color: hsl(200, 100%, 60%);
+      background-color: hsla(200, 100%, 60%, .5);
       .fa-play-icon {
         opacity: 1;
       }
