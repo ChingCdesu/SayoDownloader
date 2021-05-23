@@ -11,7 +11,7 @@
     "dev:ele": "node -r ts-node/register script/build-main --env=development --watch",
     "build:vue": "vite build",
     "build:ele": "node -r ts-node/register script/build-main --env=production",
-    "build": "rimraf dist && npm run build:vue && npm run build:ele && electron-builder -mwl"
+    "build": "rimraf dist && npm run build:vue && npm run build:ele && electron-builder"
   },
   "build": {
     "appId": "cn.sayobot.downloader",
