@@ -142,18 +142,6 @@ export default {
         dh.value[index] = item;
       }
       bytes.value = getDownloadBytes();
-      if (item.state === "completed" && store.get("openDownloaded")) {
-        openFile(item.path).then((success) => {
-          if (!success) {
-            // @ts-ignore
-            this.$notify({
-              title: "文件不存在",
-              message: `${item.path} 被移动或被删除。`,
-              type: "warning",
-            });
-          }
-        });
-      }
     };
     // add listeners
     listenerNewDownloadItem(handleUpdate);
