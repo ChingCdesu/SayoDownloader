@@ -6,10 +6,12 @@ export const ipcRendererInvoke = <T>(
   ...args: any[]
 ): Promise<T> => ipcRenderer.invoke(eventName, ...args);
 
-export const showOpenDialog = (options: Electron.OpenDialogOptions): Promise<string[] | undefined> => {
-  return ipcRendererInvoke('showOpenDialog', options)
-}
+export const showOpenDialog = (
+  options: Electron.OpenDialogOptions
+): Promise<string[] | undefined> => {
+  return ipcRendererInvoke("showOpenDialog", options);
+};
 
 export const checkPathExists = (path: string): Promise<boolean> => {
-  return ipcRendererInvoke('checkPathExists', path)
-}
+  return ipcRendererInvoke("checkPathExists", path);
+};

@@ -129,6 +129,7 @@ import Api from "@src/common/utils/api";
 import { reactive, Ref, ref, watch } from "vue";
 import { IApiBeatmapSet } from "@src/common/interfaces/api.osu";
 import { cloneDeep } from "lodash";
+import store from '@src/common/utils/store'
 
 type number_array_of_2 = [number, number];
 
@@ -175,7 +176,11 @@ export default {
     let sets: Ref<IBeatmapSet[]> = ref([]);
     let error = ref(false);
     let autoload = ref(false);
+    
     let keyword = ref("");
+    if (store.has('searchKeyword')) {
+      keyword.value = store.get('searchKeyword')
+    }
     var filter: IBeatmapFilter = reactive({
       mode: [],
       approved: [],
@@ -189,6 +194,9 @@ export default {
       bpm: [0, 0],
       length: [0, 0],
     });
+    if (store.has('searchFilter')) {
+      filter = reactive(store.get('searchFilter'));
+    }
     const limit = ref(25);
     let page = ref(0);
     const isFilterArrayEmpty = (arr: any[] | undefined): boolean => {
@@ -201,6 +209,7 @@ export default {
     };
     const isFilterEmpty = (): boolean => {
       let result = true;
+      result &&= keyword.value.length === 0;
       result &&= filter.mode?.length === 0;
       result &&= filter.approved?.length === 0;
       result &&= filter.language?.length === 0;
@@ -229,6 +238,8 @@ export default {
       autoload.value = false;
       loadMore();
       autoload.value = true;
+      store.set('searchKeyword', keyword.value);
+      store.set('searchFilter', filter)
     };
     const combineFilterObj = (): IBeatmapListParams => {
       let obj: IBeatmapListParams = {
@@ -290,6 +301,7 @@ export default {
     watch(
       () => cloneDeep(filter),
       (filter, _) => {
+        console.log(filter)
         onSearch();
       }
     );
