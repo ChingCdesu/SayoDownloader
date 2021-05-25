@@ -17,7 +17,8 @@ import {
   faVolumeOff,
   faVolumeUp,
   faListUl,
-  faTimes
+  faTimes,
+  faSpinner
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faHeart,
@@ -56,7 +57,8 @@ library.add(
   faVolumeOff,
   faVolumeUp,
   faListUl,
-  faTimes
+  faTimes,
+  faSpinner
 );
 
 createApp(App)

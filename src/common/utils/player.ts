@@ -68,6 +68,10 @@ class PlayerSingleton {
     return this._error;
   }
 
+  public get loading(): boolean {
+    return this._loading;
+  }
+
   public get playingIndex(): number {
     return this._playingIndex;
   }
@@ -141,11 +145,13 @@ class PlayerSingleton {
     this._playingIndex = index;
     if (index !== -1 && !this._playlist[index].deleted) {
       if (!this._playlist[this._playingIndex].howl) {
+        this._loading = true;
         this._playlist[this._playingIndex].howl = new Howl({
           src: [this._playlist[this._playingIndex].url],
           onload: () => {
             this._playlist[this._playingIndex].duration =
               this._playlist[this._playingIndex].howl?.duration();
+            this._loading = false;
           },
           onend: () => {
             this._playing = false;

@@ -9,14 +9,21 @@
       <font-awesome-icon
         class="control-btn"
         :icon="['fas', 'play']"
-        v-if="!this.player.playing"
+        v-if="!this.player.playing && !this.player.loading"
         @click="this.resume"
       ></font-awesome-icon>
       <font-awesome-icon
         class="control-btn"
         :icon="['fas', 'pause']"
-        v-if="this.player.playing"
+        v-if="this.player.playing && !this.player.loading"
         @click="this.pause"
+      ></font-awesome-icon>
+      <font-awesome-icon
+        class="control-btn"
+        :style="{ 'cursor': 'default' }"
+        :icon="['fas', 'spinner']"
+        spin
+        v-if="this.player.loading"
       ></font-awesome-icon>
       <font-awesome-icon
         class="control-btn"
@@ -169,8 +176,7 @@ export default {
       this.player.nextSong();
     },
     changeVolume(volume: number) {
-      if (volume !== 0)
-        this.storedVolume = volume;
+      if (volume !== 0) this.storedVolume = volume;
       this.player.setVolume(volume);
     },
     secondToTime(sec: number): string {
@@ -261,7 +267,7 @@ export default {
     justify-content: space-between;
     font-family: Torus, KiwiMaru, sans-serif;
     &.isplaying {
-      background-color: hsla(200, 100%, 60%, .5);
+      background-color: hsla(200, 100%, 60%, 0.5);
       .fa-play-icon {
         opacity: 1;
       }
