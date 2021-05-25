@@ -115,6 +115,15 @@
           <SongCard :BeatmapSet="this.sets[(index - 1) * 2 + 1]" />
         </el-col>
       </el-row>
+      <el-button
+        v-show="this.autoload"
+        class="btn-load-more"
+        :icon="'el-icon-arrow-down'"
+        size="mini"
+        round
+        @click="this.loadMore"
+        >加载更多</el-button
+      >
     </div>
   </div>
   <Player />
@@ -126,10 +135,12 @@ import SongCard from "@/components/SongCard.vue";
 import Player from "@/components/Player.vue";
 import { apiData2IBeatmapSet } from "@src/common/utils/data-trans";
 import Api from "@src/common/utils/api";
-import { reactive, Ref, ref, watch } from "vue";
+import { onMounted, reactive, Ref, ref, watch } from "vue";
 import { IApiBeatmapSet } from "@src/common/interfaces/api.osu";
 import { cloneDeep } from "lodash";
-import store from '@src/common/utils/store'
+import store from "@src/common/utils/store";
+import { OsuConstant } from "@src/common/constant";
+import { ElInfiniteScroll } from "element-plus";
 
 type number_array_of_2 = [number, number];
 
@@ -167,19 +178,18 @@ interface IBeatmapFilter {
   length?: number_array_of_2;
 }
 
-import { OsuConstant } from '@src/common/constant'
-
 export default {
   name: "home",
   components: { SongCard, Player },
+  directives: { "infinite-scroll": ElInfiniteScroll },
   setup() {
     let sets: Ref<IBeatmapSet[]> = ref([]);
     let error = ref(false);
     let autoload = ref(false);
-    
+
     let keyword = ref("");
-    if (store.has('searchKeyword')) {
-      keyword.value = store.get('searchKeyword')
+    if (store.has("searchKeyword")) {
+      keyword.value = store.get("searchKeyword");
     }
     var filter: IBeatmapFilter = reactive({
       mode: [],
@@ -194,8 +204,8 @@ export default {
       bpm: [0, 0],
       length: [0, 0],
     });
-    if (store.has('searchFilter')) {
-      filter = reactive(store.get('searchFilter'));
+    if (store.has("searchFilter")) {
+      filter = reactive(store.get("searchFilter"));
     }
     const limit = ref(25);
     let page = ref(0);
@@ -236,10 +246,10 @@ export default {
       }
       // 等第一页加载结束才启用自动滚动加载
       autoload.value = false;
-      loadMore();
+      await loadMore();
       autoload.value = true;
-      store.set('searchKeyword', keyword.value);
-      store.set('searchFilter', filter)
+      store.set("searchKeyword", keyword.value);
+      store.set("searchFilter", filter);
     };
     const combineFilterObj = (): IBeatmapListParams => {
       let obj: IBeatmapListParams = {
@@ -297,11 +307,14 @@ export default {
         sets.value.push(apiData2IBeatmapSet(beatmapset));
       }
     };
-    loadMore().then(() => (autoload.value = true));
+    onMounted(async () => {
+      await loadMore();
+      autoload.value = true;
+    });
+
     watch(
       () => cloneDeep(filter),
       (filter, _) => {
-        console.log(filter)
         onSearch();
       }
     );
@@ -385,6 +398,10 @@ export default {
     min-height: calc(100vh - 500);
     .sets-row {
       margin-bottom: 16px;
+    }
+    .btn-load-more {
+      background: rgba(73, 83, 96, 0.7);
+      color: hsl(200, 40%, 100%);
     }
   }
 }
