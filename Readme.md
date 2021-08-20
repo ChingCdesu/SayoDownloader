@@ -26,6 +26,7 @@
   * Windows用户找到SayoDownloader.exe双击打开即可
   * Mac用户将解压缩之后的App双击打开即可，建议移动到应用程序文件夹
 
-## 注意事项
-
-* SayoDownloader目前为预发布版本，在使用过程中可能遇到一些小问题，可以直接联系qq或者提出issue
+# 欢迎提issue
+# 欢迎参与开发
+--------
+# 找工作ing...
