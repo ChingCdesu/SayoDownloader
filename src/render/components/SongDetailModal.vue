@@ -7,7 +7,7 @@
   >
     <el-tab-pane
       v-for="map in this.BeatmapSet.maps"
-      :key="map"
+      :key="map.id"
       :lazy="true"
       :name="map.id.toString()"
     >
@@ -15,27 +15,27 @@
         <el-tooltip placement="top" popper-class="difficuly-tooltip">
           <template #content>
             <el-space :size="4">
-              <span :style="{ 'font-weight': 600, color: '#fff' }">{{
-                map.name
-              }}</span>
+              <span :style="{ 'font-weight': 600, color: '#fff' }">
+                {{
+                  map.name
+                }}
+              </span>
               <span
                 :style="{
                   'font-weight': 800,
                   color: this.diffColor(map.difficult),
                 }"
-                >{{ map.difficult.toFixed(2) }}</span
-              >
+              >{{ map.difficult.toFixed(2) }}</span>
             </el-space>
           </template>
           <i
             class="icon-osu"
             :class="this.getModeIconClass(map.mode)"
             :style="{ color: this.diffColor(map.difficult) }"
-        /></el-tooltip>
+          />
+        </el-tooltip>
       </template>
-      <div class="map-version-text">
-        {{ map.name }}
-      </div>
+      <div class="map-version-text">{{ map.name }}</div>
       <div class="display-title">{{ this.displayTitle }}</div>
       <div class="display-artist">{{ this.displayArtist }}</div>
       <div>作图者：{{ this.BeatmapSet.creator }}</div>
@@ -55,9 +55,7 @@
           <div>
             <span>标签：</span>
             <div class="tags">
-              <el-tag v-for="tag in this.BeatmapSet.tags" :key="tag">
-                {{ tag }}
-              </el-tag>
+              <el-tag v-for="tag in this.BeatmapSet.tags" :key="tag">{{ tag }}</el-tag>
             </div>
           </div>
         </div>
@@ -86,19 +84,9 @@
           </el-space>
           <div class="info-part2">
             <el-space direction="vertical" :size="4">
-              <div
-                class="map-info-with-bar"
-                v-for="(value, name) in map.map_diff"
-                :key="name"
-              >
-                <div class="map-info-with-bar__title">
-                  {{ this.getNameOfDiff(name) }}
-                </div>
-                <el-progress
-                  :percentage="value * 10"
-                  :show-text="false"
-                  :color="this.colors"
-                />
+              <div class="map-info-with-bar" v-for="(value, name) in map.map_diff" :key="name">
+                <div class="map-info-with-bar__title">{{ this.getNameOfDiff(name) }}</div>
+                <el-progress :percentage="value * 10" :show-text="false" :color="this.colors" />
                 <div class="map-info-with-bar__number">{{ value }}</div>
               </div>
               <div class="map-info-with-bar">
@@ -108,9 +96,7 @@
                   :show-text="false"
                   :color="this.diffColor(map.difficult)"
                 />
-                <div class="map-info-with-bar__number">
-                  {{ map.difficult.toFixed(2) }}
-                </div>
+                <div class="map-info-with-bar__number">{{ map.difficult.toFixed(2) }}</div>
               </div>
             </el-space>
           </div>
@@ -120,10 +106,10 @@
   </el-tabs>
   <div class="song-detail-modal__buttons">
     <el-tooltip content="下载">
-      <el-button circle icon="el-icon-download" @click="this.download" />
+      <el-button circle :icon="Download" @click="this.download" />
     </el-tooltip>
     <el-tooltip content="添加到播放列表">
-      <el-button circle icon="el-icon-plus" @click="this.addSong" />
+      <el-button circle :icon="Plus" @click="this.addSong" />
     </el-tooltip>
   </div>
 </template>
@@ -146,6 +132,8 @@ import {
 
 import { OsuConstant } from "@src/common/constant";
 
+import { Download, Plus } from '@element-plus/icons'
+
 export default {
   name: "SongDetailModal",
   props: {
@@ -164,6 +152,8 @@ export default {
       getModeIconClass,
       diffColor,
       activeBid: props.BeatmapSet.maps[0].id.toString(),
+      Download,
+      Plus
     };
   },
   data() {
@@ -229,11 +219,11 @@ export default {
         });
     },
     mapFilter(mode: GameMode): IBeatmap[] {
-      return this.BeatmapSet.maps.filter((v) => v.mode == mode);
+      return this.BeatmapSet.maps.filter(v => v.mode == mode);
     },
     activeChanged(tab: any) {
       const sid = Number(tab.props.name);
-      const map = this.BeatmapSet.maps.find((m) => m.id === sid);
+      const map = this.BeatmapSet.maps.find(m => m.id === sid);
       const color = this.diffColor(map?.difficult as number);
       document.body.style.setProperty(
         "--song-detail-modal__active-color",
@@ -318,7 +308,7 @@ export default {
 
   .display-title {
     font-size: 30px;
-    font-weight: 500;;
+    font-weight: 500;
     line-height: 1;
   }
 
@@ -402,7 +392,7 @@ export default {
   margin-top: 20px;
   text-align: right;
   .el-button {
-    font-size: 18px;
+    font-size: 14px;
   }
 }
 </style>

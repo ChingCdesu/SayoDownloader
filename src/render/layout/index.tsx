@@ -6,9 +6,10 @@ import './index.less'
 export default defineComponent({
   name: 'layouts.tsx',
   setup(_, ctx) {
+    const bottom = 70, right = 20
     return () => (
       <ElContainer class='app-layout h-100'>
-        <ElBacktop target=".el-main" style="z-index: 100; color: hsl(200, 100%, 60%);" bottom="70" right="20"></ElBacktop>
+        <ElBacktop target=".el-main" style="z-index: 100; color: hsl(200, 100%, 60%);" bottom={bottom} right={right} />
         <ElAside width="52px">
           <Slider />
         </ElAside>

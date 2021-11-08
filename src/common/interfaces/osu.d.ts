@@ -1,37 +1,37 @@
 import {GameMode, Approved, Language, Genre} from "@src/common/enums/osu"
 
 export interface IMapDiffSettings {
-    cs: Number,
-    hp: Number,
-    od: Number,
-    ar: Number
+    cs: number,
+    hp: number,
+    od: number,
+    ar: number
 }
 
 export interface IBeatmap {
-    id: Number,
-    name: String,
-    difficult: Number,
+    id: number,
+    name: string,
+    difficult: number,
     mode: GameMode,
-    circle_count: Number,
-    slider_count: Number,
-    spinner_count: Number,
+    circle_count: number,
+    slider_count: number,
+    spinner_count: number,
     map_diff: IMapDiffSettings
 }
 
 export interface IBeatmapSet {
-    id: Number,
-    title: String,
-    titleU?: String,
-    creator: String,
-    artist: String,
-    artistU?: String,
+    id: number,
+    title: string,
+    titleU?: string,
+    creator: string,
+    artist: string,
+    artistU?: string,
     approved: Approved,
-    tags: String[],
-    sources: String[],
+    tags: string[],
+    sources: string[],
     language: Language,
     genre: Genre,
-    duration: Number,
-    bpm: Number,
+    duration: number,
+    bpm: number,
     maps: IBeatmap[],
     audio?: string
 }

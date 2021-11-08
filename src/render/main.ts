@@ -32,7 +32,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 // const fs = require('fs')
 // const { ipcRenderer } = require('electron')
 
-import "element-plus/lib/theme-chalk/index.css";
+import "element-plus/dist/index.css";
 import "@/assets/style/boot4-part.less";
 import "@/assets/fonts/torus/torus.less";
 import "@/assets/fonts/osu/osu.less"

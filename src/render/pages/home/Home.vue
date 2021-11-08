@@ -4,8 +4,8 @@
       <div
         class="beatmap-filter-background"
         :style="{
-          'background-image': this.sets[0]
-            ? `url(https://a.sayobot.cn/beatmaps/${this.sets[0].id}/covers/cover.webp)`
+          backgroundImage: sets[0]
+            ? `url(https://a.sayobot.cn/beatmaps/${sets[0].id}/covers/cover.webp)`
             : 'none',
         }"
       ></div>
@@ -15,8 +15,8 @@
           class="filter-search-input"
           suffix-icon="el-icon-search"
           placeholder="搜索关键字..."
-          v-model="this.keyword"
-          @change="this.onSearch"
+          v-model="keyword"
+          @change="onSearch"
         />
       </div>
       <table class="conditions">
@@ -24,60 +24,52 @@
           <tr>
             <td class="condition-header" width="60">模式</td>
             <td class="condition-content">
-              <el-checkbox-group v-model="this.filter.mode" size="mini">
+              <el-checkbox-group v-model="filter.mode" size="mini">
                 <el-checkbox-button
-                  v-for="option in this.modeOptions"
+                  v-for="option in modeOptions"
                   :key="option"
                   :label="option.value"
-                  :class="this.filterBtnClass"
-                >
-                  {{ option.label }}
-                </el-checkbox-button>
+                  :class="filterBtnClass"
+                >{{ option.label }}</el-checkbox-button>
               </el-checkbox-group>
             </td>
           </tr>
           <tr>
             <td class="condition-header" width="60">分类</td>
             <td class="condition-content">
-              <el-checkbox-group v-model="this.filter.approved" size="mini">
+              <el-checkbox-group v-model="filter.approved" size="mini">
                 <el-checkbox-button
-                  v-for="option in this.approvedOptions"
+                  v-for="option in approvedOptions"
                   :key="option"
                   :label="option.value"
-                  :class="this.filterBtnClass"
-                >
-                  {{ option.label }}
-                </el-checkbox-button>
+                  :class="filterBtnClass"
+                >{{ option.label }}</el-checkbox-button>
               </el-checkbox-group>
             </td>
           </tr>
           <tr>
             <td class="condition-header" width="60">流派</td>
             <td class="condition-content">
-              <el-checkbox-group v-model="this.filter.genre" size="mini">
+              <el-checkbox-group v-model="filter.genre" size="mini">
                 <el-checkbox-button
-                  v-for="option in this.genreOptions"
+                  v-for="option in genreOptions"
                   :key="option"
                   :label="option.value"
-                  :class="this.filterBtnClass"
-                >
-                  {{ option.label }}
-                </el-checkbox-button>
+                  :class="filterBtnClass"
+                >{{ option.label }}</el-checkbox-button>
               </el-checkbox-group>
             </td>
           </tr>
           <tr>
             <td class="condition-header" width="60">语言</td>
             <td class="condition-content">
-              <el-checkbox-group v-model="this.filter.language" size="mini">
+              <el-checkbox-group v-model="filter.language" size="mini">
                 <el-checkbox-button
-                  v-for="option in this.languageOptions"
+                  v-for="option in languageOptions"
                   :key="option"
                   :label="option.value"
-                  :class="this.filterBtnClass"
-                >
-                  {{ option.label }}
-                </el-checkbox-button>
+                  :class="filterBtnClass"
+                >{{ option.label }}</el-checkbox-button>
               </el-checkbox-group>
             </td>
           </tr>
@@ -86,44 +78,42 @@
     </div>
     <div
       class="beatmapsets"
-      v-infinite-scroll="this.loadMore"
-      :infinite-scroll-disabled="!this.autoload"
+      v-infinite-scroll="loadMore"
+      :infinite-scroll-disabled="!autoload"
       :infinite-scroll-immediate="false"
     >
       <el-row
-        v-for="index in parseInt(this.sets.length / 2)"
+        v-for="index in (Math.ceil(sets.length / 2) + 1)"
         :key="index"
-        style="width: 100%"
         class="sets-row"
       >
         <el-col
           :xs="{ span: 11, offset: 0 }"
           :sm="{ span: 11, offset: 0 }"
-          :md="{ span: 10, offset: 2 }"
+          :md="{ span: 11, offset: 0 }"
           class="sets-item"
-          style="margin-right: 8px"
         >
-          <SongCard :BeatmapSet="this.sets[(index - 1) * 2]" />
+          <SongCard :BeatmapSet="sets[(index - 1) * 2]" v-if="sets[(index - 1) * 2]" />
         </el-col>
         <el-col
           :xs="{ span: 11, offset: 0 }"
           :sm="{ span: 11, offset: 0 }"
-          :md="{ span: 10, offset: 2 }"
+          :md="{ span: 11, offset: 0 }"
           class="sets-item"
-          style="margin-left: 8px"
         >
-          <SongCard :BeatmapSet="this.sets[(index - 1) * 2 + 1]" />
+          <SongCard :BeatmapSet="sets[(index - 1) * 2 + 1]" v-if="sets[(index - 1) * 2 + 1]" />
         </el-col>
       </el-row>
-      <el-button
-        v-show="this.autoload"
+      <!-- <el-button
+        v-show="autoload"
         class="btn-load-more"
         :icon="'el-icon-arrow-down'"
         size="mini"
         round
-        @click="this.loadMore"
-        >加载更多</el-button
-      >
+        v-if="!no_more"
+        @click="loadMore"
+      >加载更多</el-button> -->
+      <el-alert v-if="no_more" title="没有更多啦！" center show-icon type="info" :closable="false" />
     </div>
   </div>
   <Player />
@@ -186,6 +176,7 @@ export default {
     let sets: Ref<IBeatmapSet[]> = ref([]);
     let error = ref(false);
     let autoload = ref(false);
+    let no_more = ref(false);
 
     let keyword = ref("");
     if (store.has("searchKeyword")) {
@@ -207,7 +198,7 @@ export default {
     if (store.has("searchFilter")) {
       filter = reactive(store.get("searchFilter"));
     }
-    const limit = ref(25);
+    const limit = ref(20);
     let page = ref(0);
     const isFilterArrayEmpty = (arr: any[] | undefined): boolean => {
       return arr?.length === 0;
@@ -236,8 +227,9 @@ export default {
     const onSearch = async () => {
       page.value = 0;
       sets.value = [];
+      no_more.value = false;
       const try_convert = Number(keyword.value);
-      if (try_convert !== NaN) {
+      if (!isNaN(try_convert)) {
         const result = await Api.get(`/v2/beatmapinfo?K=${try_convert}`);
         if (result && result.status === 200 && result.data.status === 0) {
           const data = result.data.data as IApiBeatmapSet;
@@ -290,6 +282,7 @@ export default {
       return obj;
     };
     const loadMore = async () => {
+      if (no_more.value) return;
       page.value++;
       const result = await Api.post("/?post", combineFilterObj());
       if (!result || result.status !== 200 || result.data.status !== 0) {
@@ -298,6 +291,7 @@ export default {
       }
       for (var i = 0; i < result.data.data.length; ++i) {
         const sid = result.data.data[i].sid;
+        if (sets.value.findIndex(v => v.id === sid) !== -1) continue;
         const info = await Api.get(`/v2/beatmapinfo?K=${sid}`);
         if (!info || result.status !== 200) {
           error.value = true;
@@ -306,9 +300,13 @@ export default {
         const beatmapset = info.data.data as IApiBeatmapSet;
         sets.value.push(apiData2IBeatmapSet(beatmapset));
       }
+      if (sets.value.length >= result.data.results) {
+        no_more.value = true;
+        console.log('no more')
+      }
     };
     onMounted(async () => {
-      await loadMore();
+      await onSearch();
       autoload.value = true;
     });
 
@@ -319,7 +317,7 @@ export default {
       }
     );
 
-    return { sets, error, filter, onSearch, loadMore, keyword, autoload };
+    return { sets, error, filter, onSearch, loadMore, keyword, autoload, no_more };
   },
   data() {
     const filterBtnClass = "filter-checkbox-btn";
@@ -395,14 +393,21 @@ export default {
 
   .beatmapsets {
     width: 100%;
-    min-height: calc(100vh - 500);
+    min-height: calc(100vh - 500px);
+    margin-bottom: 40px;
     .sets-row {
       margin-bottom: 16px;
+      width: 100%;
+      justify-content: space-evenly;
     }
     .btn-load-more {
       background: rgba(73, 83, 96, 0.7);
       color: hsl(200, 40%, 100%);
     }
   }
+}
+
+.sets-item {
+  margin-right: 8px;
 }
 </style>

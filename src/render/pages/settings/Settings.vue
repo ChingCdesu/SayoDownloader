@@ -6,35 +6,35 @@
         <div :style="{ display: 'flex' }">
           <el-input
             class="download-path-input"
-            v-model="this.downloadPath"
-            @change="this.changeDownloadPath"
-            @input="this.checkPathExists"
+            v-model="downloadPath"
+            @change="changeDownloadPath"
+            @input="checkPathExists"
           />
-          <el-button @click="this.defaultPathDialog">选择</el-button>
+          <el-button @click="defaultPathDialog">选择</el-button>
         </div>
-        <span class="tips tips-error">{{ this.pathErrorMsg }}</span>
+        <span class="tips tips-error">{{ pathErrorMsg }}</span>
       </el-form-item>
       <el-form-item :label="'下载osz版本'">
         <div>
           <el-radio
             class="radio-osz-version"
-            v-model="this.oszVersion"
+            v-model="oszVersion"
             label="full"
-            @change="this.changeOszVersion"
+            @change="changeOszVersion"
             >全部</el-radio
           >
           <el-radio
             class="radio-osz-version"
-            v-model="this.oszVersion"
+            v-model="oszVersion"
             label="novideo"
-            @change="this.changeOszVersion"
+            @change="changeOszVersion"
             >不带视频</el-radio
           >
           <el-radio
             class="radio-osz-version"
-            v-model="this.oszVersion"
+            v-model="oszVersion"
             label="mini"
-            @change="this.changeOszVersion"
+            @change="changeOszVersion"
             >mini</el-radio
           >
         </div>
@@ -48,15 +48,15 @@
       <el-form-item :label="'下载完成后打开文件'">
         <el-switch
           active-color="#13ce66"
-          v-model="this.openDownloaded"
-          @change="this.changeOpenDownloaded"
+          v-model="openDownloaded"
+          @change="changeOpenDownloaded"
         ></el-switch>
       </el-form-item>
       <el-form-item :label="'以源语言显示歌曲名和歌手名'">
         <el-switch
           active-color="#13ce66"
-          v-model="this.displayWithUnicode"
-          @change="this.changeDisplayWithUnicode"
+          v-model="displayWithUnicode"
+          @change="changeDisplayWithUnicode"
         ></el-switch>
       </el-form-item>
     </el-form>

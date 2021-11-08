@@ -247,6 +247,7 @@ export default {
   .download-items {
     color: #fff;
     width: 100%;
+    margin-bottom: 40px;
     .el-space__item {
       width: 100%;
     }
