@@ -1,6 +1,6 @@
 {
   "name": "downloader",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "main": "dist/main/index.js",
   "author": "_ChingC",
   "license": "MIT",
@@ -16,7 +16,7 @@
   "build": {
     "appId": "cn.sayobot.downloader",
     "productName": "SayoDownloader",
-    "asar": false,
+    "asar": true,
     "directories": {
       "output": "release/${version}"
     },
@@ -61,11 +61,12 @@
     "@fortawesome/free-regular-svg-icons": "^5.15.3",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/vue-fontawesome": "^3.0.0-3",
-    "vue": "^3.0.7",
-    "vue-router": "^4.0.5"
+    "vue": "next",
+    "vue-router": "next"
   },
   "devDependencies": {
     "@cliqz/url-parser": "^1.1.4",
+    "@element-plus/icons": "^0.0.11",
     "@rollup/plugin-alias": "^3.1.2",
     "@rollup/plugin-commonjs": "^17.1.0",
     "@rollup/plugin-json": "^4.1.0",
@@ -80,10 +81,10 @@
     "axios": "^0.21.1",
     "chalk": "^4.1.0",
     "concurrently": "^5.3.0",
-    "electron": "12.0.2",
-    "electron-builder": "^22.8.0",
+    "electron": "latest",
+    "electron-builder": "latest",
     "electron-store": "^7.0.2",
-    "element-plus": "^1.0.2-beta.44",
+    "element-plus": "latest",
     "howler": "^2.2.1",
     "less": "^4.1.1",
     "lodash": "^4.17.21",
