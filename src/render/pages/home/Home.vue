@@ -82,11 +82,7 @@
       :infinite-scroll-disabled="!autoload"
       :infinite-scroll-immediate="false"
     >
-      <el-row
-        v-for="index in (Math.ceil(sets.length / 2) + 1)"
-        :key="index"
-        class="sets-row"
-      >
+      <el-row v-for="index in (Math.ceil(sets.length / 2) + 1)" :key="index" class="sets-row">
         <el-col
           :xs="{ span: 11, offset: 0 }"
           :sm="{ span: 11, offset: 0 }"
@@ -112,7 +108,7 @@
         round
         v-if="!no_more"
         @click="loadMore"
-      >加载更多</el-button> -->
+      >加载更多</el-button>-->
       <el-alert v-if="no_more" title="没有更多啦！" center show-icon type="info" :closable="false" />
     </div>
   </div>
@@ -131,6 +127,8 @@ import { cloneDeep } from "lodash";
 import store from "@src/common/utils/store";
 import { OsuConstant } from "@src/common/constant";
 import { ElInfiniteScroll } from "element-plus";
+
+import { listenerLinkBeatmap } from '@src/render/hooks/protocol/ipc-renderer'
 
 type number_array_of_2 = [number, number];
 
@@ -316,6 +314,24 @@ export default {
         onSearch();
       }
     );
+
+    const handleLinkBeatmap = (_: any, url: string) => {
+      const uri = new URL(url)
+      const [type] = uri.pathname.substr(1).split('/')
+      switch (type) {
+        case 'beatmapsets':
+          {
+            const [_, sid] = uri.pathname.substr(1).split('/')
+            keyword.value = sid
+            onSearch()
+            break;
+          }
+        default: break
+      }
+
+    }
+
+    listenerLinkBeatmap(handleLinkBeatmap)
 
     return { sets, error, filter, onSearch, loadMore, keyword, autoload, no_more };
   },

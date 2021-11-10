@@ -1,6 +1,6 @@
 {
   "name": "downloader",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "main": "dist/main/index.js",
   "author": "_ChingC",
   "license": "MIT",
@@ -10,13 +10,20 @@
     "dev:vue": "vite",
     "dev:ele": "node -r ts-node/register script/build-main --env=development --watch",
     "build:vue": "vite build",
-    "build:ele": "node -r ts-node/register script/build-main --env=production",
-    "build": "rimraf dist && npm run build:vue && npm run build:ele && electron-builder"
+    "build:ele": "node -r ts-node/register script/build-main --env=production && electron-builder",
+    "build": "rimraf dist && npm run build:vue && npm run build:ele"
   },
   "build": {
     "appId": "cn.sayobot.downloader",
     "productName": "SayoDownloader",
     "asar": true,
+    "protocols": [
+      {
+        "name": "sayo",
+        "role": "Viewer",
+        "schemes": ["sayo"]
+      }
+    ],
     "directories": {
       "output": "release/${version}"
     },
@@ -32,7 +39,7 @@
       "to": "app/src/preload"
     },
     "mac": {
-      "artifactName": "${productName}_${version}.${ext}",
+      "artifactName": "${productName}_v${version}.Mac.${ext}",
       "target": [
         "zip"
       ]
@@ -40,17 +47,17 @@
     "win": {
       "target": [
         {
-          "target": "portable",
+          "target": "nsis",
           "arch": [
             "x64"
           ]
         }
       ],
-      "artifactName": "${productName}_${version}.${ext}"
+      "artifactName": "${productName}_v${version}.WindowsInstaller.${ext}"
     },
     "nsis": {
       "oneClick": false,
-      "perMachine": false,
+      "perMachine": true,
       "allowToChangeInstallationDirectory": true,
       "deleteAppDataOnUninstall": false
     }
