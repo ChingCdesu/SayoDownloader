@@ -86,7 +86,6 @@
 <script lang="ts">
 import {
   retryDownloadFile,
-  getDownloadPath,
   newDownloadFile,
   getDownloadData,
   removeDownloadItem,
@@ -159,7 +158,7 @@ export default {
       const file: INewDownloadFile = {
         url: "https://dl.sayobot.cn/beatmaps/download/full/886402",
         fileName: "Kano - Daisy Blue.osz",
-        path: await getDownloadPath(),
+        path: store.get("defaultDownloadPath"),
       };
       newDownloadFile(file);
     },

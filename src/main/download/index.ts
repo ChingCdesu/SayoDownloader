@@ -5,13 +5,11 @@ import {
   dialog,
   WebContents,
   DownloadItem,
-  webContents,
 } from "electron";
 
 import {
   IDownloadFile,
   INewDownloadFile,
-  IPagination,
 } from "@src/common/interfaces/download";
 import {
   getFileExt,
@@ -41,6 +39,7 @@ import {
 } from "./helper";
 import store from "@src/common/utils/store";
 import path from "path";
+import fs from "fs";
 
 let win: BrowserWindow | null;
 let newDownloadItem: INewDownloadFile | null;
@@ -370,6 +369,10 @@ const listenerEvent = () => {
 
 export const registerDownloadService = (window: BrowserWindow | null): void => {
   win = window;
+  const downloadPath = store.get("defaultDownloadPath");
+  if (!fs.existsSync(downloadPath)) {
+    store.set("defaultDownloadPath", app.getPath("downloads"));
+  }
   listenerEvent();
   const onClose = () => {
     // 窗口关闭时，将下载中或中断的项暂停，并删除本地缓存

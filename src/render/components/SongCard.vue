@@ -119,7 +119,6 @@ import {
 } from "@src/common/utils/osu";
 import {
 	newDownloadFile,
-	getDownloadPath,
 } from "@/hooks/download/ipc-renderer";
 
 export default {

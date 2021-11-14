@@ -121,7 +121,6 @@ import store from "@src/common/utils/store";
 import { Approved, GameMode } from "@src/common/enums/osu";
 import {
   newDownloadFile,
-  getDownloadPath,
 } from "@/hooks/download/ipc-renderer";
 import PlayerSingleton from "@src/common/utils/player";
 import {
