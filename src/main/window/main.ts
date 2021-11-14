@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { BrowserWindow } from "electron";
 import { options, getLoadURL, WinSubscribe, EventCallback } from "./utils";
 
 export class Main extends WinSubscribe {

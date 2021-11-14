@@ -25,12 +25,7 @@ function init() {
   registerAppService();
   mainWin.open();
   registerDownloadService(mainWin.win);
-}
-
-const lock = app.requestSingleInstanceLock();
-if (!lock) {
-  app.quit();
-} else {
+  
   app.on("second-instance", (event, argv) => {
     const win = mainWin.win;
     if (win) {
@@ -46,5 +41,14 @@ if (!lock) {
   app.on("open-url", (event, url) => {
     mainWin.win?.webContents.send("link-beatmap", url);
   });
+  app.on("window-all-closed", () => {
+    app.quit();
+  });
+}
+
+const lock = app.requestSingleInstanceLock();
+if (!lock) {
+  app.quit();
+} else {
   app.whenReady().then(init);
 }

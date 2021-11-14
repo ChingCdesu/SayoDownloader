@@ -13,7 +13,7 @@ export const options: Electron.BrowserWindowConstructorOptions = {
   webPreferences: {
     nodeIntegration: true,
     contextIsolation: false,
-    preload: join(__dirname, "../../src/preload/index.js"),
+    // preload: join(__dirname, "../../src/preload/index.js"),
     webSecurity: app.isPackaged,
   },
   ...(app.isPackaged

@@ -1,4 +1,4 @@
-import { BrowserWindow, protocol, app } from "electron";
+import { app } from "electron";
 import path from "path";
 
 const agreement = "sayo";

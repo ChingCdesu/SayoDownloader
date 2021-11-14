@@ -444,10 +444,10 @@
   dependencies:
     slash "^3.0.0"
 
-"@rollup/plugin-commonjs@^17.1.0":
-  version "17.1.0"
-  resolved "https://registry.npmmirror.com/@rollup/plugin-commonjs/download/@rollup/plugin-commonjs-17.1.0.tgz#757ec88737dffa8aa913eb392fade2e45aef2a2d"
-  integrity sha1-dX7Ihzff+oqpE+s5L63i5FrvKi0=
+"@rollup/plugin-commonjs@^21.1.0":
+  version "21.0.1"
+  resolved "https://registry.npmmirror.com/@rollup/plugin-commonjs/download/@rollup/plugin-commonjs-21.0.1.tgz#1e57c81ae1518e4df0954d681c642e7d94588fee"
+  integrity sha1-HlfIGuFRjk3wlU1oHGQufZRYj+4=
   dependencies:
     "@rollup/pluginutils" "^3.1.0"
     commondir "^1.0.1"
