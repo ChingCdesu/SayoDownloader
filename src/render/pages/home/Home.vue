@@ -89,7 +89,11 @@
           :md="{ span: 11, offset: 0 }"
           class="sets-item"
         >
-          <SongCard :BeatmapSet="sets[(index - 1) * 2]" v-if="sets[(index - 1) * 2]" />
+          <SongCard
+            :BeatmapSet="sets[(index - 1) * 2]"
+            v-if="sets[(index - 1) * 2]"
+            @show-detail="e => console.log(e)"
+          />
         </el-col>
         <el-col
           :xs="{ span: 11, offset: 0 }"
@@ -97,7 +101,11 @@
           :md="{ span: 11, offset: 0 }"
           class="sets-item"
         >
-          <SongCard :BeatmapSet="sets[(index - 1) * 2 + 1]" v-if="sets[(index - 1) * 2 + 1]" />
+          <SongCard
+            :BeatmapSet="sets[(index - 1) * 2 + 1]"
+            v-if="sets[(index - 1) * 2 + 1]"
+            @show-detail="e => console.log(e)"
+          />
         </el-col>
       </el-row>
       <!-- <el-button
@@ -113,12 +121,32 @@
     </div>
   </div>
   <Player />
+  <el-dialog
+    v-model="this.modalVisible"
+    width="75%"
+    :modal="true"
+    :show-close="false"
+    :destroy-on-close="true"
+    :lock-scroll="true"
+    :append-to-body="true"
+    :center="true"
+    custom-class="song-detail-modal"
+  >
+    <SongDetailModal :BeatmapSet="sets.filter(set => set.id === modalSid)[0] || undefined" />
+    <div
+      class="modal-background"
+      :style="{
+        'background-image': `url(https://a.sayobot.cn/beatmaps/${this.BeatmapSet.id}/covers/cover.webp)`,
+      }"
+    ></div>
+  </el-dialog>
 </template>
 
 <script lang="ts">
 import { IBeatmapSet } from "@src/common/interfaces/osu";
 import SongCard from "@/components/SongCard.vue";
 import Player from "@/components/Player.vue";
+import SongDetailModal from "@/components/SongDetailModal.vue";
 import { apiData2IBeatmapSet } from "@src/common/utils/data-trans";
 import Api from "@src/common/utils/api";
 import { onMounted, reactive, Ref, ref, watch } from "vue";
@@ -168,13 +196,15 @@ interface IBeatmapFilter {
 
 export default {
   name: "home",
-  components: { SongCard, Player },
+  components: { SongCard, Player, SongDetailModal },
   directives: { "infinite-scroll": ElInfiniteScroll },
   setup() {
     let sets: Ref<IBeatmapSet[]> = ref([]);
     let error = ref(false);
     let autoload = ref(false);
     let no_more = ref(false);
+    let modalVisible = ref(false);
+    let modalSid = ref(-1);
 
     let keyword = ref("");
     if (store.has("searchKeyword")) {
@@ -333,7 +363,7 @@ export default {
 
     listenerLinkBeatmap(handleLinkBeatmap)
 
-    return { sets, error, filter, onSearch, loadMore, keyword, autoload, no_more };
+    return { sets, error, filter, onSearch, loadMore, keyword, autoload, no_more, modalSid, modalVisible };
   },
   data() {
     const filterBtnClass = "filter-checkbox-btn";
