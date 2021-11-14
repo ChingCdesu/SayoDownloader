@@ -104,7 +104,7 @@
 			:center="true"
 			custom-class="song-detail-modal"
 		>
-			<song-detail-modal :BeatmapSet="this.BeatmapSet" />
+			<SongDetailModal :BeatmapSet="this.BeatmapSet" />
 			<div
 				class="modal-background"
 				:style="{

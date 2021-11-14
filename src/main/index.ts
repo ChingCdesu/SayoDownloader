@@ -26,7 +26,7 @@ function init() {
   registerAppService()
   mainWin.open()
   registerDownloadService(mainWin.win)
-  registerSayoProtocol(mainWin.win)
+  registerSayoProtocol()
 }
 
 const lock = app.requestSingleInstanceLock()
@@ -44,6 +44,9 @@ if (!lock) {
         }
       })
     }
+  })
+  app.on('open-url', (event, url) => {
+    mainWin.win?.webContents.send('link-beatmap', url)
   })
   app.whenReady().then(init)
 }
