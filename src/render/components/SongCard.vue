@@ -142,7 +142,6 @@ export default {
 		const player = PlayerSingleton.instance;
 		return {
 			diffspace: 1,
-			modalVisible: false,
 			mouseInDetailDiv: false,
 			mouseInDiffsDiv: false,
 			player,

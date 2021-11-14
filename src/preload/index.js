@@ -2,24 +2,24 @@
 
 /** docoment 加载完成 */
 function domReady(...args) {
-  const condition = args.length ? [...args] : ['complete', 'interactive']
+  const condition = args.length ? [...args] : ["complete", "interactive"];
   return new Promise(resolve => {
     if (condition.includes(document.readyState)) {
-      resolve(true)
+      resolve(true);
     } else {
-      document.addEventListener('readystatechange', () => {
+      document.addEventListener("readystatechange", () => {
         if (condition.includes(document.readyState)) {
-          resolve(true)
+          resolve(true);
         }
-      })
+      });
     }
-  })
+  });
 }
 
 /** 插入 loading */
 function insertLoading() {
-  const loadingStyle = document.createElement('style');
-  const loadingBox = document.createElement('div');
+  const loadingStyle = document.createElement("style");
+  const loadingBox = document.createElement("div");
 
   loadingStyle.textContent += `
   /* https://projects.lukehaas.me/css-loaders/ */
@@ -95,8 +95,8 @@ function insertLoading() {
     }
   }`;
 
-  loadingBox.classList.add('loading-box', 'load1');
-  loadingBox.innerHTML += '<div class="loader"></div>';
+  loadingBox.classList.add("loading-box", "load1");
+  loadingBox.innerHTML += "<div class=\"loader\"></div>";
 
   const appendLoading = () => {
     document.head.appendChild(loadingStyle);
@@ -108,10 +108,10 @@ function insertLoading() {
     document.body.removeChild(loadingBox);
   };
 
-  return { loadingStyle, loadingBox, removeLoading, appendLoading }
+  return { loadingStyle, loadingBox, removeLoading, appendLoading };
 }
 
-; (async function () {
+ (async function () {
   await domReady();
 
   let _isCallClosePreloadLoading = false;

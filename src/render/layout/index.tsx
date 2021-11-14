@@ -1,12 +1,12 @@
-import { defineComponent } from 'vue'
-import { ElContainer, ElMain, ElAside, ElBacktop } from 'element-plus'
-import Slider from './slider'
-import './index.less'
+import { defineComponent } from "vue";
+import { ElContainer, ElMain, ElAside, ElBacktop } from "element-plus";
+import Slider from "./slider";
+import "./index.less";
 
 export default defineComponent({
-  name: 'layouts.tsx',
+  name: "layouts.tsx",
   setup(_, ctx) {
-    const bottom = 70, right = 20
+    const bottom = 70, right = 20;
     return () => (
       <ElContainer class='app-layout h-100'>
         <ElBacktop target=".el-main" style="z-index: 100; color: hsl(200, 100%, 60%);" bottom={bottom} right={right} />
@@ -18,6 +18,6 @@ export default defineComponent({
           {ctx?.slots?.default?.()}
         </ElMain>
       </ElContainer>
-    )
+    );
   },
-})
+});

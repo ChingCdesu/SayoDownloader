@@ -136,8 +136,8 @@ export const listenerDownload = async (
       let index = 0;
       const ext = getFileExt(saveFilePath);
       let fileNameWithoutExt = path.basename(saveFilePath, ext);
-      const arr = fileNameWithoutExt.match(/\(\d+\)$/g)
-      if (arr) fileNameWithoutExt = fileNameWithoutExt.substr(0, fileNameWithoutExt.length - 3).trim()
+      const arr = fileNameWithoutExt.match(/\(\d+\)$/g);
+      if (arr) fileNameWithoutExt = fileNameWithoutExt.substr(0, fileNameWithoutExt.length - 3).trim();
       const p = path.dirname(saveFilePath);
       while (isExistFile(saveFilePath)) {
         if (index !== 0) {
@@ -213,7 +213,7 @@ const retryDownloadFile = (data: IDownloadFile): boolean => {
   console.log(data.path);
   newDownloadItem = {
     fileName: data.fileName + ".download",
-    path: data.path + '.download',
+    path: data.path + ".download",
     url: data.url,
   };
   tempDownloadItemIds.push(data.id);

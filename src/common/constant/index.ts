@@ -1,4 +1,4 @@
-export * as OsuConstant from "./osu"
+export * as OsuConstant from "./osu";
 
 
-export { version } from '../../../package.json'
+export { version } from "../../../package.json";

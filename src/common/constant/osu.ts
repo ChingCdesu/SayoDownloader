@@ -1,4 +1,4 @@
-import { Language, Genre } from '@src/common/enums/osu'
+import { Language, Genre } from "@src/common/enums/osu";
 
 export const mode = [
     { label: "std", value: 1 },
@@ -41,22 +41,22 @@ export const language = [
 ];
 
 export const LanguageChinese = [
-    { enum: Language.any, value: '所有' },
-    { enum: Language.chinese, value: '中文' },
-    { enum: Language.english, value: '英语' },
-    { enum: Language.french, value: '法语' },
-    { enum: Language.german, value: '德语' },
-    { enum: Language.instrumental, value: '纯音乐' },
-    { enum: Language.italian, value: '意大利语' },
-    { enum: Language.japanese, value: '日语' },
-    { enum: Language.korean, value: '韩语' },
-    { enum: Language.other, value: '其他' },
-    { enum: Language.polish, value: '波兰语' },
-    { enum: Language.russian, value: '俄语' },
-    { enum: Language.spanish, value: '西班牙语' },
-    { enum: Language.swedish, value: '瑞典语' },
-    { enum: Language.unspecified, value: '尚未指定' },
-]
+    { enum: Language.any, value: "所有" },
+    { enum: Language.chinese, value: "中文" },
+    { enum: Language.english, value: "英语" },
+    { enum: Language.french, value: "法语" },
+    { enum: Language.german, value: "德语" },
+    { enum: Language.instrumental, value: "纯音乐" },
+    { enum: Language.italian, value: "意大利语" },
+    { enum: Language.japanese, value: "日语" },
+    { enum: Language.korean, value: "韩语" },
+    { enum: Language.other, value: "其他" },
+    { enum: Language.polish, value: "波兰语" },
+    { enum: Language.russian, value: "俄语" },
+    { enum: Language.spanish, value: "西班牙语" },
+    { enum: Language.swedish, value: "瑞典语" },
+    { enum: Language.unspecified, value: "尚未指定" },
+];
 export const GenreChinese = [
     { value: "所有", enum: Genre.any },
     { value: "尚未指定", enum: Genre.unspecified },

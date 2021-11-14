@@ -1,11 +1,10 @@
-import { IpcRendererEvent, ipcRenderer } from 'electron'
+import { IpcRendererEvent, ipcRenderer } from "electron";
 
 import {
     IDownloadFile,
     INewDownloadFile,
-    IPagination,
     IPCEventName,
-} from '@src/common/interfaces/download'
+} from "@src/common/interfaces/download";
 
 /**
  * 添加 ipc 调用监听事件
@@ -17,9 +16,9 @@ export const ipcRendererListener = (
     callback: (event: IpcRendererEvent, ...args: any[]) => void,
 ): void => {
     ipcRenderer.on(eventName, (event, ...args: any[]) => {
-        callback(event, ...args)
-    })
-}
+        callback(event, ...args);
+    });
+};
 
 /**
  * 调用 ipc 的处理事件
@@ -28,60 +27,60 @@ export const ipcRendererListener = (
  * @returns `Promise<any>`
  */
 export const ipcRendererInvoke = <T>(eventName: IPCEventName, ...args: any[]): Promise<T> =>
-    ipcRenderer.invoke(eventName, ...args)
+    ipcRenderer.invoke(eventName, ...args);
 
 /**
  * 打开文件
  * @param path - 路径
  */
-export const openFile = (path: string): Promise<boolean> => ipcRendererInvoke('openFile', path)
+export const openFile = (path: string): Promise<boolean> => ipcRendererInvoke("openFile", path);
 
 /**
  * 打开下载管理器
  */
 export const openDownloadManager = (): void => {
-    ipcRendererInvoke('openDownloadManager', '/download-manager/demo')
-}
+    ipcRendererInvoke("openDownloadManager", "/download-manager/demo");
+};
 
 /**
  * 新建下载项
  * @param formData - 下载数据
  */
 export const newDownloadFile = (formData: INewDownloadFile): Promise<IDownloadFile | null> =>
-    ipcRendererInvoke<IDownloadFile | null>('newDownloadFile', formData)
+    ipcRendererInvoke<IDownloadFile | null>("newDownloadFile", formData);
 
 /**
  * 重新下载
  */
 export const retryDownloadFile = (item: IDownloadFile): Promise<boolean> =>
-    ipcRendererInvoke<boolean>('retryDownloadFile', item)
+    ipcRendererInvoke<boolean>("retryDownloadFile", item);
 
 /**
  * 打开选择保存位置对话框
  * @param path - 路径
  */
 export const openFileDialog = (path: string): Promise<string> =>
-    ipcRendererInvoke<string>('openFileDialog', path)
+    ipcRendererInvoke<string>("openFileDialog", path);
 
 /**
  * 暂停或恢复下载
  * @param item - 下载项
  */
 export const pauseOrResume = (item: IDownloadFile): Promise<IDownloadFile> =>
-    ipcRendererInvoke<IDownloadFile>('pauseOrResume', item)
+    ipcRendererInvoke<IDownloadFile>("pauseOrResume", item);
 
 /**
  * 打开文件所在位置
  * @param path - 路径
  */
 export const openFileInFolder = (path: string): Promise<boolean> =>
-    ipcRendererInvoke<boolean>('openFileInFolder', path)
+    ipcRendererInvoke<boolean>("openFileInFolder", path);
 
 /**
  * 获取下载数据
  */
 export const getDownloadData = (): Promise<IDownloadFile[]> =>
-    ipcRendererInvoke('getDownloadData')
+    ipcRendererInvoke("getDownloadData");
 
 /**
  * 删除下载项。下载中的将先取消，再删除
@@ -89,22 +88,22 @@ export const getDownloadData = (): Promise<IDownloadFile[]> =>
  * @param index - 下载项的下标
  */
 export const removeDownloadItem = (item: IDownloadFile, index: number): Promise<IDownloadFile> =>
-    ipcRendererInvoke<IDownloadFile>('removeDownloadItem', item, index)
+    ipcRendererInvoke<IDownloadFile>("removeDownloadItem", item, index);
 
 /**
  * 清空下载完成项
  */
 export const clearDownloadDone = (): Promise<IDownloadFile[]> =>
-    ipcRendererInvoke('clearDownloadDone')
+    ipcRendererInvoke("clearDownloadDone");
 
 /**
  * 获取下载路径
  */
 export const getDownloadPath = (): Promise<string> =>
-    ipcRendererInvoke('getDownloadPath')
+    ipcRendererInvoke("getDownloadPath");
 
 export const getDownloadItemCount = (): Promise<number> =>
-    ipcRendererInvoke('getDownloadItemCount')
+    ipcRendererInvoke("getDownloadItemCount");
 
 /**
  * 监听新建下载项事件
@@ -112,7 +111,7 @@ export const getDownloadItemCount = (): Promise<number> =>
  */
 export const listenerNewDownloadItem = (
     callback: (event: IpcRendererEvent, ...args: any[]) => void,
-): void => ipcRendererListener('newDownloadItem', callback)
+): void => ipcRendererListener("newDownloadItem", callback);
 
 /**
  * 监听下载项更新事件
@@ -120,7 +119,7 @@ export const listenerNewDownloadItem = (
  */
 export const listenerDownloadItemUpdate = (
     callback: (event: IpcRendererEvent, ...args: any[]) => void,
-): void => ipcRendererListener('downloadItemUpdate', callback)
+): void => ipcRendererListener("downloadItemUpdate", callback);
 
 /**
  * 监听下载项完成事件
@@ -128,7 +127,7 @@ export const listenerDownloadItemUpdate = (
  */
 export const listenerDownloadItemDone = (
     callback: (event: IpcRendererEvent, ...args: any[]) => void,
-): void => ipcRendererListener('downloadItemDone', callback)
+): void => ipcRendererListener("downloadItemDone", callback);
 
 /**
  * 监听下载项删除事件

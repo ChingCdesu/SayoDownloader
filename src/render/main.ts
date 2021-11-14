@@ -35,8 +35,8 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import "element-plus/dist/index.css";
 import "@/assets/style/boot4-part.less";
 import "@/assets/fonts/torus/torus.less";
-import "@/assets/fonts/osu/osu.less"
-import '@/assets/fonts/kiwimaru/kiwimaru.less'
+import "@/assets/fonts/osu/osu.less";
+import "@/assets/fonts/kiwimaru/kiwimaru.less";
 import "./index.less";
 
 library.add(
