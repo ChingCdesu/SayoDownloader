@@ -1,2 +1,2 @@
 export type IPCEventName = 
-  | 'link-beatmap'
+  | "link-beatmap"

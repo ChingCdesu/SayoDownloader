@@ -7,12 +7,12 @@ const colors = [
   "#f9a55f",
   "#f9514e",
   "#a067ff",
-]
-const diffs = [0, 2.0, 2.7, 4.0, 5.3, 6.5]
-const expertPurple = "#937eff"
+];
+const diffs = [0, 2.0, 2.7, 4.0, 5.3, 6.5];
+const expertPurple = "#937eff";
 
 const HexToRgb = (sColor: string): number[] => {
-  let reg = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+  const reg = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
   sColor = sColor.toLowerCase();
   if (sColor && reg.test(sColor)) {
     if (sColor.length === 4) {
@@ -23,7 +23,7 @@ const HexToRgb = (sColor: string): number[] => {
       sColor = sColorNew;
     }
     //处理六位的颜色值
-    let sColorChange = [];
+    const sColorChange = [];
     for (let i = 1; i < 7; i += 2) {
       sColorChange.push(parseInt("0x" + sColor.slice(i, i + 2)));
     }
@@ -31,13 +31,13 @@ const HexToRgb = (sColor: string): number[] => {
   } else {
     return [];
   }
-}
+};
 
 const RgbToHex = (rgb: string): string => {
-  let _this = rgb;
-  let reg = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+  const _this = rgb;
+  const reg = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
   if (/^(rgb|RGB)/.test(_this)) {
-    let aColor = _this.replace(/(?:\(|\)|rgb|RGB)*/g, "").split(",");
+    const aColor = _this.replace(/(?:\(|\)|rgb|RGB)*/g, "").split(",");
     let strHex = "#";
     for (let i = 0; i < aColor.length; i++) {
       let hex = Number(aColor[i]).toString(16);
@@ -49,7 +49,7 @@ const RgbToHex = (rgb: string): string => {
     }
     return strHex;
   } else if (reg.test(_this)) {
-    let aNum = _this.replace(/#/, "").split("");
+    const aNum = _this.replace(/#/, "").split("");
     if (aNum.length === 6) {
       return _this;
     } else if (aNum.length === 3) {
@@ -63,7 +63,7 @@ const RgbToHex = (rgb: string): string => {
     return _this;
   }
   return "";
-}
+};
 
 const gradientColor = (
   startColor: string,
@@ -71,18 +71,18 @@ const gradientColor = (
   step: number,
   index: number
 ): string => {
-  let startRGB = HexToRgb(startColor); //转换为rgb数组模式
-  let startR = startRGB[0];
-  let startG = startRGB[1];
-  let startB = startRGB[2];
-  let endRGB = HexToRgb(endColor);
-  let endR = endRGB[0];
-  let endG = endRGB[1];
-  let endB = endRGB[2];
+  const startRGB = HexToRgb(startColor); //转换为rgb数组模式
+  const startR = startRGB[0];
+  const startG = startRGB[1];
+  const startB = startRGB[2];
+  const endRGB = HexToRgb(endColor);
+  const endR = endRGB[0];
+  const endG = endRGB[1];
+  const endB = endRGB[2];
 
-  let sR = (endR - startR) / step; //总差值
-  let sG = (endG - startG) / step;
-  let sB = (endB - startB) / step;
+  const sR = (endR - startR) / step; //总差值
+  const sG = (endG - startG) / step;
+  const sB = (endB - startB) / step;
 
   return RgbToHex(
     "rgb(" +
@@ -93,7 +93,7 @@ const gradientColor = (
     Math.round(sB * index + startB) +
     ")"
   );
-}
+};
 
 export const diffColor = (diff: number): string => {
   if (diff > 6.5) {
@@ -111,14 +111,14 @@ export const diffColor = (diff: number): string => {
     Math.round(step),
     Math.round(i)
   );
-}
+};
 
 export const getModeIconClass = (mode: GameMode) => {
   return "mode-" + GameMode[mode];
-}
+};
 
 export const gameModeString = (mode: GameMode): string => {
   const prefix = mode === GameMode.osu ? "" : "osu!";
   const suffix = mode === GameMode.osu ? "!" : "";
   return prefix + GameMode[mode] + suffix;
-}
+};

@@ -4,7 +4,7 @@ import store from "@src/common/utils/store";
 
 const uuidV4 = function () {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
+    const r = (Math.random() * 16) | 0,
       v = c == "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
@@ -27,13 +27,13 @@ class PlayerSingleton {
 
   private _playlistLoop: PlayListLoop = "list";
   private _playlist: PlayListItem[];
-  private _error: boolean = false;
+  private _error = false;
   private _playingIndex = -1;
   private _playing = false;
   private _loading = false;
 
   private removeHowl(items: PlayListItem[]): PlayListItem[] {
-    let ret: PlayListItem[] = [];
+    const ret: PlayListItem[] = [];
     items.forEach((v) => {
       ret.push({
         id: v.id,
@@ -50,7 +50,9 @@ class PlayerSingleton {
 
   public walkSync: (item: PlayListItem) => void = function (
     item: PlayListItem
-  ) {};
+  ) {
+    //
+  };
 
   public get playlistLoop() {
     return this._playlistLoop;
@@ -123,7 +125,7 @@ class PlayerSingleton {
       this._playlist[this._playingIndex].timer =
         Math.round(this._playlist[this._playingIndex].howl?.seek() as number) ||
         0;
-      var item: PlayListItem = this._playlist[this._playingIndex];
+      const item: PlayListItem = this._playlist[this._playingIndex];
       this.walkSync({
         id: item.id,
         sid: item.sid,

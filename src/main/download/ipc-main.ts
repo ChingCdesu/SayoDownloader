@@ -1,5 +1,5 @@
-import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import { IPCEventName } from '@src/common/interfaces/download'
+import { ipcMain, IpcMainInvokeEvent } from "electron";
+import { IPCEventName } from "@src/common/interfaces/download";
 
 /**
  * 添加 ipc 调用的处理事件
@@ -11,6 +11,6 @@ export const ipcMainHandle = <T>(
   listener: (event: IpcMainInvokeEvent, ...args: any[]) => Promise<T> | void | T,
 ): void => {
   ipcMain.handle(eventName, async (event, ...args: any[]) => {
-    return listener(event, ...args)
-  })
-}
+    return listener(event, ...args);
+  });
+};

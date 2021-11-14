@@ -1,4 +1,4 @@
-import {GameMode, Approved, Language, Genre} from "@src/common/enums/osu"
+import {GameMode, Approved, Language, Genre} from "@src/common/enums/osu";
 
 export interface IMapDiffSettings {
     cs: number,

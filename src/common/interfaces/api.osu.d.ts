@@ -52,3 +52,39 @@ export interface IApiBeatmapSet {
     titleU: string,
     video: number
 }
+
+export type number_array_of_2 = [number, number];
+
+export interface IBeatmapListParams {
+    cmd: string;
+    limit: number;
+    offset: number;
+    type: string;
+    keyword?: string;
+    subType?: number;
+    mode?: number;
+    class?: number;
+    genre?: number;
+    language?: number;
+    stars?: number_array_of_2;
+    ar?: number_array_of_2;
+    od?: number_array_of_2;
+    cs?: number_array_of_2;
+    hp?: number_array_of_2;
+    bpm?: number_array_of_2;
+    length?: number_array_of_2;
+}
+
+export interface IBeatmapFilter {
+    mode?: number[];
+    approved?: number[];
+    genre?: number[];
+    language?: number[];
+    stars?: number_array_of_2;
+    ar?: number_array_of_2;
+    od?: number_array_of_2;
+    cs?: number_array_of_2;
+    hp?: number_array_of_2;
+    bpm?: number_array_of_2;
+    length?: number_array_of_2;
+}

@@ -89,7 +89,11 @@
           :md="{ span: 11, offset: 0 }"
           class="sets-item"
         >
-          <SongCard :BeatmapSet="sets[(index - 1) * 2]" v-if="sets[(index - 1) * 2]" />
+          <SongCard
+            :BeatmapSet="sets[(index - 1) * 2]"
+            v-if="sets[(index - 1) * 2]"
+            @show-detail="showDetail"
+          />
         </el-col>
         <el-col
           :xs="{ span: 11, offset: 0 }"
@@ -97,7 +101,11 @@
           :md="{ span: 11, offset: 0 }"
           class="sets-item"
         >
-          <SongCard :BeatmapSet="sets[(index - 1) * 2 + 1]" v-if="sets[(index - 1) * 2 + 1]" />
+          <SongCard
+            :BeatmapSet="sets[(index - 1) * 2 + 1]"
+            v-if="sets[(index - 1) * 2 + 1]"
+            @show-detail="showDetail"
+          />
         </el-col>
       </el-row>
       <!-- <el-button
@@ -113,16 +121,38 @@
     </div>
   </div>
   <Player />
+  <el-dialog
+    v-model="this.modalVisible"
+    width="75%"
+    :modal="true"
+    :show-close="false"
+    :destroy-on-close="true"
+    :lock-scroll="true"
+    :append-to-body="true"
+    :center="true"
+    custom-class="song-detail-modal"
+  >
+    <SongDetailModal :BeatmapSet="modalMap" />
+    <div
+      class="modal-background"
+      :style="{
+        'background-image': `url(https://a.sayobot.cn/beatmaps/${modalMap?.id}/covers/cover.webp)`,
+      }"
+    ></div>
+  </el-dialog>
 </template>
 
 <script lang="ts">
 import { IBeatmapSet } from "@src/common/interfaces/osu";
+import { IApiBeatmapSet, IBeatmapListParams, IBeatmapFilter } from "@src/common/interfaces/api.osu";
+
 import SongCard from "@/components/SongCard.vue";
 import Player from "@/components/Player.vue";
+
+import SongDetailModal from "@/components/SongDetailModal.vue";
 import { apiData2IBeatmapSet } from "@src/common/utils/data-trans";
 import Api from "@src/common/utils/api";
 import { onMounted, reactive, Ref, ref, watch } from "vue";
-import { IApiBeatmapSet } from "@src/common/interfaces/api.osu";
 import { cloneDeep } from "lodash";
 import store from "@src/common/utils/store";
 import { OsuConstant } from "@src/common/constant";
@@ -130,51 +160,17 @@ import { ElInfiniteScroll } from "element-plus";
 
 import { listenerLinkBeatmap } from '@src/render/hooks/protocol/ipc-renderer'
 
-type number_array_of_2 = [number, number];
-
-interface IBeatmapListParams {
-  cmd: string;
-  limit: number;
-  offset: number;
-  type: string;
-  keyword?: string;
-  subType?: number;
-  mode?: number;
-  class?: number;
-  genre?: number;
-  language?: number;
-  stars?: number_array_of_2;
-  ar?: number_array_of_2;
-  od?: number_array_of_2;
-  cs?: number_array_of_2;
-  hp?: number_array_of_2;
-  bpm?: number_array_of_2;
-  length?: number_array_of_2;
-}
-
-interface IBeatmapFilter {
-  mode?: number[];
-  approved?: number[];
-  genre?: number[];
-  language?: number[];
-  stars?: number_array_of_2;
-  ar?: number_array_of_2;
-  od?: number_array_of_2;
-  cs?: number_array_of_2;
-  hp?: number_array_of_2;
-  bpm?: number_array_of_2;
-  length?: number_array_of_2;
-}
-
 export default {
   name: "home",
-  components: { SongCard, Player },
+  components: { SongCard, Player, SongDetailModal },
   directives: { "infinite-scroll": ElInfiniteScroll },
   setup() {
     let sets: Ref<IBeatmapSet[]> = ref([]);
     let error = ref(false);
     let autoload = ref(false);
     let no_more = ref(false);
+    let modalVisible = ref(false);
+    let modalMap: Ref<IBeatmapSet | undefined> = ref(undefined);
 
     let keyword = ref("");
     if (store.has("searchKeyword")) {
@@ -300,7 +296,7 @@ export default {
       }
       if (sets.value.length >= result.data.results) {
         no_more.value = true;
-        console.log('no more')
+        // console.log('no more')
       }
     };
     onMounted(async () => {
@@ -315,25 +311,29 @@ export default {
       }
     );
 
+    const showDetail = (sid: number) => {
+      modalMap.value = sets.value.find(v => v.id === sid)
+      modalVisible.value = true
+    }
+
     const handleLinkBeatmap = (_: any, url: string) => {
       const uri = new URL(url)
       const [type] = uri.pathname.substr(1).split('/')
       switch (type) {
-        case 'beatmapsets':
-          {
-            const [_, sid] = uri.pathname.substr(1).split('/')
-            keyword.value = sid
-            onSearch()
-            break;
-          }
-        default: break
+        case 'beatmapsets': {
+          const [_, sid] = uri.pathname.substr(1).split('/')
+          showDetail(Number(sid))
+          break;
+        }
+        default:
+          break
       }
 
     }
 
     listenerLinkBeatmap(handleLinkBeatmap)
 
-    return { sets, error, filter, onSearch, loadMore, keyword, autoload, no_more };
+    return { sets, error, filter, onSearch, loadMore, keyword, autoload, no_more, modalMap, modalVisible, showDetail };
   },
   data() {
     const filterBtnClass = "filter-checkbox-btn";
@@ -389,11 +389,13 @@ export default {
             &:first-child .el-checkbox-button__inner {
               border-left-color: hsl(200, 100%, 60%);
             }
+
             .el-checkbox-button__inner {
               background: hsl(200, 100%, 60%);
               border-color: hsl(200, 100%, 60%);
             }
           }
+
           .el-checkbox-button__inner {
             background: rgba(73, 83, 96, 0.7);
             color: hsl(200, 40%, 100%);
@@ -411,11 +413,13 @@ export default {
     width: 100%;
     min-height: calc(100vh - 500px);
     margin-bottom: 40px;
+
     .sets-row {
       margin-bottom: 16px;
       width: 100%;
       justify-content: space-evenly;
     }
+
     .btn-load-more {
       background: rgba(73, 83, 96, 0.7);
       color: hsl(200, 40%, 100%);

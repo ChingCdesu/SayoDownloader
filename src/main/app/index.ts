@@ -1,27 +1,29 @@
-import { ipcMainHandle } from "./ipc-main"
-import { dialog } from "electron"
-import fs from "fs"
+import { ipcMainHandle } from "./ipc-main";
+import { registerSayoProtocol} from "./protocol";
+import { dialog } from "electron";
+import fs from "fs";
 
 const showOpenDialog = (options: Electron.OpenDialogOptions) => {
-  return dialog.showOpenDialogSync(options)
-}
+  return dialog.showOpenDialogSync(options);
+};
 
 const checkPathExists = (path: string) => {
-  return fs.existsSync(path)
-}
+  return fs.existsSync(path);
+};
 
 const registerListener = () => {
   ipcMainHandle(
     "showOpenDialog",
     (event, options: Electron.OpenDialogOptions) => {
-      return showOpenDialog(options)
+      return showOpenDialog(options);
     }
-  )
+  );
   ipcMainHandle("checkPathExists", (event, path: string) => {
-    return checkPathExists(path)
-  })
-}
+    return checkPathExists(path);
+  });
+};
 
 export const registerAppService = () => {
-  registerListener()
-}
+  registerListener();
+  registerSayoProtocol();
+};

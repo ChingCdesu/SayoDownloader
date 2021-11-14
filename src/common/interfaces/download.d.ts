@@ -1,24 +1,24 @@
-import { DownloadItem } from 'electron'
+import { DownloadItem } from "electron";
 
-export type DownloadItemState = 'progressing' | 'completed' | 'cancelled' | 'interrupted'
+export type DownloadItemState = "progressing" | "completed" | "cancelled" | "interrupted"
 
 export type IPCEventName =
-    | 'openDownloadManager'
-    | 'getDownloadData'
-    | 'newDownloadFile'
-    | 'retryDownloadFile'
-    | 'openFileDialog'
-    | 'openFile'
-    | 'openFileInFolder'
-    | 'initDownloadItem'
-    | 'pauseOrResume'
-    | 'removeDownloadItem'
-    | 'clearDownloadDone'
-    | 'newDownloadItem'
-    | 'downloadItemUpdate'
-    | 'downloadItemDone'
-    | 'getDownloadPath'
-    | 'getDownloadItemCount'
+    | "openDownloadManager"
+    | "getDownloadData"
+    | "newDownloadFile"
+    | "retryDownloadFile"
+    | "openFileDialog"
+    | "openFile"
+    | "openFileInFolder"
+    | "initDownloadItem"
+    | "pauseOrResume"
+    | "removeDownloadItem"
+    | "clearDownloadDone"
+    | "newDownloadItem"
+    | "downloadItemUpdate"
+    | "downloadItemDone"
+    | "getDownloadPath"
+    | "getDownloadItemCount"
 
 export interface INewDownloadFile {
     url: string

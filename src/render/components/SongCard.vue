@@ -18,7 +18,7 @@
 			<div class="play" @click="this.addSongAndPlay">
 				<font-awesome-icon :icon="['fas', 'play']" />
 			</div>
-			<div class="info" @click="this.modalVisible = true">
+			<div class="info" @click="this.$emit('show-detail', this.BeatmapSet.id)">
 				<span class="song-title info-text">{{ this.displayTitle }}</span>
 				<span class="song-artist info-text">作曲/歌手: {{ this.displayArtist }}</span>
 				<span class="song-creator info-text">作图者: {{ this.BeatmapSet.creator }}</span>
@@ -93,25 +93,6 @@
 				</el-space>
 			</div>
 		</el-collapse-transition>
-		<el-dialog
-			v-model="this.modalVisible"
-			width="75%"
-			:modal="true"
-			:show-close="false"
-			:destroy-on-close="true"
-			:lock-scroll="true"
-			:append-to-body="true"
-			:center="true"
-			custom-class="song-detail-modal"
-		>
-			<SongDetailModal :BeatmapSet="this.BeatmapSet" />
-			<div
-				class="modal-background"
-				:style="{
-					'background-image': `url(https://a.sayobot.cn/beatmaps/${this.BeatmapSet.id}/covers/cover.webp)`,
-				}"
-			></div>
-		</el-dialog>
 	</div>
 </template>
 
@@ -131,7 +112,6 @@ import {
 	IBeatmap
 } from "@src/common/interfaces/osu";
 import PlayerSingleton from "@src/common/utils/player";
-import SongDetailModal from "./SongDetailModal.vue";
 import {
 	diffColor,
 	getModeIconClass,
@@ -144,9 +124,6 @@ import {
 
 export default {
 	name: "SongCard",
-	components: {
-		SongDetailModal,
-	},
 	props: {
 		BeatmapSet: {
 			type: Object as PropType<IBeatmapSet>,
@@ -165,7 +142,6 @@ export default {
 		const player = PlayerSingleton.instance;
 		return {
 			diffspace: 1,
-			modalVisible: false,
 			mouseInDetailDiv: false,
 			mouseInDiffsDiv: false,
 			player,

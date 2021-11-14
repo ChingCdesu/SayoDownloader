@@ -1,6 +1,6 @@
 {
   "name": "downloader",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "main": "dist/main/index.js",
   "author": "_ChingC",
   "license": "MIT",
@@ -11,19 +11,13 @@
     "dev:ele": "node -r ts-node/register script/build-main --env=development --watch",
     "build:vue": "vite build",
     "build:ele": "node -r ts-node/register script/build-main --env=production && electron-builder",
-    "build": "rimraf dist && npm run build:vue && npm run build:ele"
+    "build": "rimraf dist && npm run build:vue && npm run build:ele",
+    "lint": "eslint ./src/**/*.ts ./src/**/*.js --fix"
   },
   "build": {
     "appId": "cn.sayobot.downloader",
     "productName": "SayoDownloader",
     "asar": true,
-    "protocols": [
-      {
-        "name": "sayo",
-        "role": "Viewer",
-        "schemes": ["sayo"]
-      }
-    ],
     "directories": {
       "output": "release/${version}"
     },
@@ -47,19 +41,13 @@
     "win": {
       "target": [
         {
-          "target": "nsis",
+          "target": "portable",
           "arch": [
             "x64"
           ]
         }
       ],
-      "artifactName": "${productName}_v${version}.WindowsInstaller.${ext}"
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": true,
-      "allowToChangeInstallationDirectory": true,
-      "deleteAppDataOnUninstall": false
+      "artifactName": "${productName}_v${version}.Windows.${ext}"
     }
   },
   "dependencies": {
@@ -81,6 +69,8 @@
     "@rollup/plugin-typescript": "^8.2.1",
     "@types/howler": "^2.2.2",
     "@types/minimist": "^1.2.1",
+    "@typescript-eslint/eslint-plugin": "^5.3.1",
+    "@typescript-eslint/parser": "^5.3.1",
     "@vitejs/plugin-vue": "^1.1.4",
     "@vitejs/plugin-vue-jsx": "^1.1.4",
     "@vue/compiler-sfc": "^3.0.7",
@@ -92,6 +82,8 @@
     "electron-builder": "latest",
     "electron-store": "^7.0.2",
     "element-plus": "latest",
+    "eslint": "^8.2.0",
+    "eslint-plugin-vue": "^8.0.3",
     "howler": "^2.2.1",
     "less": "^4.1.1",
     "lodash": "^4.17.21",
