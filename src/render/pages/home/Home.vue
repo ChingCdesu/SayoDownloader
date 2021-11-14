@@ -166,6 +166,7 @@ export default {
   directives: { "infinite-scroll": ElInfiniteScroll },
   setup() {
     let sets: Ref<IBeatmapSet[]> = ref([]);
+    let linksets: Ref<IBeatmapSet[]> = ref([]);
     let error = ref(false);
     let autoload = ref(false);
     let no_more = ref(false);
@@ -287,7 +288,7 @@ export default {
         const sid = result.data.data[i].sid;
         if (sets.value.findIndex(v => v.id === sid) !== -1) continue;
         const info = await Api.get(`/v2/beatmapinfo?K=${sid}`);
-        if (!info || result.status !== 200) {
+        if (!info || info.status !== 200) {
           error.value = true;
           return;
         }
@@ -312,23 +313,29 @@ export default {
     );
 
     const showDetail = (sid: number) => {
-      modalMap.value = sets.value.find(v => v.id === sid)
+      modalMap.value = [...sets.value, ...linksets.value].find(v => v.id === sid)
       modalVisible.value = true
     }
 
-    const handleLinkBeatmap = (_: any, url: string) => {
+    const handleLinkBeatmap = async (_: any, url: string) => {
       const uri = new URL(url)
       const [type] = uri.pathname.substr(1).split('/')
       switch (type) {
         case 'beatmapsets': {
           const [_, sid] = uri.pathname.substr(1).split('/')
+          const info = await Api.get(`/v2/beatmapinfo?K=${sid}`);
+          if (!info || info.status !== 200) {
+            error.value = true;
+            return;
+          }
+          const beatmapset = info.data.data as IApiBeatmapSet;
+          linksets.value.push(apiData2IBeatmapSet(beatmapset));
           showDetail(Number(sid))
           break;
         }
         default:
           break
       }
-
     }
 
     listenerLinkBeatmap(handleLinkBeatmap)

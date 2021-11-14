@@ -4,50 +4,50 @@
 			<div class="left-cover">
 				<img
 					class="img-cover"
-					:src="`https://assets.ppy.sh/beatmaps/${this.BeatmapSet.id}/covers/list@2x.jpg`"
+					:src="`https://assets.ppy.sh/beatmaps/${BeatmapSet.id}/covers/list@2x.jpg`"
 				/>
 			</div>
 			<div class="right-cover">
 				<img
 					class="img-cover"
-					:src="`https://assets.ppy.sh/beatmaps/${this.BeatmapSet.id}/covers/card.jpg`"
+					:src="`https://assets.ppy.sh/beatmaps/${BeatmapSet.id}/covers/card.jpg`"
 				/>
 			</div>
 		</div>
 		<div class="content">
-			<div class="play" @click="this.addSongAndPlay">
+			<div class="play" @click="addSongAndPlay">
 				<font-awesome-icon :icon="['fas', 'play']" />
 			</div>
-			<div class="info" @click="this.$emit('show-detail', this.BeatmapSet.id)">
-				<span class="song-title info-text">{{ this.displayTitle }}</span>
-				<span class="song-artist info-text">作曲/歌手: {{ this.displayArtist }}</span>
-				<span class="song-creator info-text">作图者: {{ this.BeatmapSet.creator }}</span>
+			<div class="info" @click="$emit('show-detail', BeatmapSet.id)">
+				<span class="song-title info-text">{{ displayTitle }}</span>
+				<span class="song-artist info-text">作曲/歌手: {{ displayArtist }}</span>
+				<span class="song-creator info-text">作图者: {{ BeatmapSet.creator }}</span>
 				<el-space
 					class="song-maps-inner"
-					@mouseleave="this.mouseInDiffsDiv = false"
-					@mouseenter="this.mouseInDiffsDiv = true"
+					@mouseleave="mouseInDiffsDiv = false"
+					@mouseenter="mouseInDiffsDiv = true"
 				>
-					<div :class="this.approvedClass">{{ this.approved }}</div>
+					<div :class="approvedClass">{{ approved }}</div>
 					<div class="diffs">
-						<el-space v-for="mode in this.modes" :key="mode" :size="3">
-							<el-space v-if="this.mapFilter(mode).length !== 0" align="center" :size="this.diffspace">
-								<i class="icon-osu diffs-mode-icon" :class="this.getModeIconClass(mode)" />
+						<el-space v-for="mode in modes" :key="mode" :size="3">
+							<el-space v-if="mapFilter(mode).length !== 0" align="center" :size="diffspace">
+								<i class="icon-osu diffs-mode-icon" :class="getModeIconClass(mode)" />
 								<el-space
-									v-if="this.mapFilter(mode).length < 15"
+									v-if="mapFilter(mode).length < 15"
 									class="diffs__inner"
-									:size="this.diffspace"
+									:size="diffspace"
 								>
 									<div
 										class="diff"
-										v-for="beatmap in this.mapFilter(mode)"
+										v-for="beatmap in mapFilter(mode)"
 										:key="beatmap.id"
-										:style="{ background: this.diffColor(beatmap.difficult) }"
+										:style="{ background: diffColor(beatmap.difficult) }"
 									></div>
 								</el-space>
 								<span
-									v-if="this.mapFilter(mode).length >= 15"
+									v-if="mapFilter(mode).length >= 15"
 									class="diff-count"
-								>{{ this.mapFilter(mode).length }}</span>
+								>{{ mapFilter(mode).length }}</span>
 							</el-space>
 						</el-space>
 					</div>
@@ -55,11 +55,11 @@
 			</div>
 			<div class="menu">
 				<div class="menu-inner">
-					<el-tooltip :content="this.downloadTooltip">
+					<el-tooltip :content="downloadTooltip">
 						<font-awesome-icon
 							:icon="['fas', 'file-download']"
 							class="fa-icon"
-							@click="this.download"
+							@click="download"
 							style="cursor: pointer"
 						></font-awesome-icon>
 					</el-tooltip>
@@ -69,21 +69,21 @@
 		<el-collapse-transition>
 			<div
 				class="diff-details"
-				v-show="this.detailShow"
-				@mouseenter="this.mouseInDetailDiv = true"
-				@mouseleave="this.mouseInDetailDiv = false"
+				v-show="detailShow"
+				@mouseenter="mouseInDetailDiv = true"
+				@mouseleave="mouseInDetailDiv = false"
 			>
 				<el-space class="diff-details__inner" direction="vertical" alignment="start">
-					<div class="diff-details__mode" v-for="mode in this.modes" :key="mode">
+					<div class="diff-details__mode" v-for="mode in modes" :key="mode">
 						<el-space
 							class="diff-detail"
 							:size="2"
 							alignment="baseline"
 							:key="map.id"
-							v-for="map in this.mapFilter(mode)"
+							v-for="map in mapFilter(mode)"
 						>
-							<i class="icon-osu detail-popover-mode-icon" :class="this.getModeIconClass(map.mode)" />
-							<span class="stars" :style="{ background: this.diffColor(map.difficult) }">
+							<i class="icon-osu detail-popover-mode-icon" :class="getModeIconClass(map.mode)" />
+							<span class="stars" :style="{ background: diffColor(map.difficult) }">
 								<font-awesome-icon :icon="['fas', 'star']" />
 								{{ map.difficult.toFixed(2) }}
 							</span>
