@@ -3,29 +3,19 @@
     <h1 class="page-title">下载列表</h1>
     <el-space direction="vertical" class="download-items">
       <div
-        v-for="(item, index) in this.dh"
+        v-for="(item, index) in dh"
         :key="index"
         class="download-item"
-        :style="{
-          '--background': `url('https://a.sayobot.cn/beatmaps/${this.getQuerySid(
-            item.url
-          )}/covers/cover.webp')`,
-        }"
+        :style="
+        `--background: url('https://a.sayobot.cn/beatmaps/${getQuerySid(
+          item.url
+        )}/covers/cover.webp')`"
       >
-        <font-awesome-icon
-          :icon="['far', 'file-archive']"
-          size="2x"
-        ></font-awesome-icon>
+        <font-awesome-icon :icon="['far', 'file-archive']" size="2x"></font-awesome-icon>
         <div class="info">
           <div class="file-name">{{ item.fileName }}</div>
-          <div
-            class="progress-bar"
-            v-if="item.paused === false && item.state === 'progressing'"
-          >
-            <el-progress
-              :percentage="item.progress * 100"
-              :format="this.formatPercentage"
-            />
+          <div class="progress-bar" v-if="item.paused === false && item.state === 'progressing'">
+            <el-progress :percentage="item.progress * 100" :format="formatPercentage" />
           </div>
           <el-space
             direction="horizontal"
@@ -35,40 +25,34 @@
             prefix-cls="w-auto"
           >
             <div class="progress">
-              {{ this.byteUnited(item.receivedBytes) }} /
-              {{ this.byteUnited(item.totalBytes) }}
+              {{ byteUnited(item.receivedBytes) }} /
+              {{ byteUnited(item.totalBytes) }}
             </div>
-            <div class="status">
-              {{ this.displayStatus(item) }}
-            </div>
+            <div class="status">{{ displayStatus(item) }}</div>
           </el-space>
         </div>
         <div class="actions">
-          <div class="btn-action" @click="this.removeDownloadItem(item, index)">
+          <div class="btn-action" @click="removeDownloadItem(item, index)">
             <font-awesome-icon :icon="['fas', 'times']" />
           </div>
           <div
             class="btn-action"
             v-if="item.paused || item.state !== 'progressing'"
-            @click="this.redoBtnClick(item)"
+            @click="redoBtnClick(item)"
           >
             <font-awesome-icon :icon="['fas', 'redo']" />
           </div>
           <div
             class="btn-action"
             v-if="item.state === 'progressing' && !item.paused"
-            @click="this.pauseOrResumeDownload(item)"
+            @click="pauseOrResumeDownload(item)"
           >
             <font-awesome-icon :icon="['fas', 'pause']" />
           </div>
-          <div class="btn-action" @click="this.openFolder(item)">
+          <div class="btn-action" @click="openFolder(item)">
             <font-awesome-icon :icon="['far', 'folder-open']" />
           </div>
-          <div
-            class="btn-action"
-            v-if="item.state === 'completed'"
-            @click="this.openFile(item)"
-          >
+          <div class="btn-action" v-if="item.state === 'completed'" @click="openFile(item)">
             <font-awesome-icon :icon="['far', 'file']" />
           </div>
         </div>
@@ -76,8 +60,8 @@
     </el-space>
     <div class="fixed-footer">
       <el-space>
-        <div>已下载: {{ this.byteUnited(bytes.receivedBytes) }}</div>
-        <div>总共: {{ this.byteUnited(bytes.totalBytes) }}</div>
+        <div>已下载: {{ byteUnited(bytes.receivedBytes) }}</div>
+        <div>总共: {{ byteUnited(bytes.totalBytes) }}</div>
       </el-space>
     </div>
   </div>
@@ -89,7 +73,7 @@ import {
   newDownloadFile,
   getDownloadData,
   removeDownloadItem,
-  openFile,
+  openFile as _openFile,
   openFileInFolder,
   clearDownloadDone,
   listenerNewDownloadItem,
@@ -110,7 +94,7 @@ import { cloneDeep } from "lodash";
 import store from "@src/common/utils/store";
 
 export default {
-  name: "downloads",
+  name: "DownloadsPage",
   setup() {
     let bytes: Ref<IDownloadBytes> = ref({ receivedBytes: 0, totalBytes: 0 });
     let dh: Ref<IDownloadFile[]> = ref([]);
@@ -142,27 +126,8 @@ export default {
       }
       bytes.value = getDownloadBytes();
     };
-    // add listeners
-    listenerNewDownloadItem(handleUpdate);
-    listenerDownloadItemUpdate(handleUpdate);
-    listenerDownloadItemDone(handleUpdate);
 
-    return {
-      dh,
-      bytes,
-      getDownloadBytes,
-    };
-  },
-  methods: {
-    async btnClick() {
-      const file: INewDownloadFile = {
-        url: "https://dl.sayobot.cn/beatmaps/download/full/886402",
-        fileName: "Kano - Daisy Blue.osz",
-        path: store.get("defaultDownloadPath"),
-      };
-      newDownloadFile(file);
-    },
-    byteUnited(byte: number): string {
+    const byteUnited = (byte: number): string => {
       const units = ["bytes", "KB", "MB", "GB"];
       let count = 0;
       while (byte > 1024 && count < 3) {
@@ -170,29 +135,29 @@ export default {
         byte /= 1024;
       }
       return byte.toFixed(2) + units[count];
-    },
-    displayStatus(item: IDownloadFile): string {
+    };
+    const displayStatus = (item: IDownloadFile): string => {
       if (item.state == "cancelled") return "已取消";
       if (item.state == "interrupted") return "下载失败";
       if (item.state == "completed") return "已完成";
       if (item.state == "progressing") {
         if (item.paused) return "已暂停";
-        else return `${this.byteUnited(item.speed)}/s`;
+        else return `${byteUnited(item.speed)}/s`;
       }
       return "";
-    },
-    getQuerySid(url: string): number {
+    };
+    const getQuerySid = (url: string): number => {
       const _url = new URL(url);
       const sid = _url.searchParams.get("filename")?.split("%20")[0];
       if (sid) return parseInt(sid);
       else return 0;
-    },
-    pauseOrResumeDownload(item: IDownloadFile) {
+    };
+    const pauseOrResumeDownload = (item: IDownloadFile) => {
       const _item = cloneDeep(item);
       pauseOrResume(_item);
-    },
-    async openFile(item: IDownloadFile) {
-      const success = await openFile(item.path);
+    };
+    const openFile = async (item: IDownloadFile) => {
+      const success = await _openFile(item.path);
       if (!success) {
         // @ts-ignore
         this.$notify({
@@ -201,8 +166,8 @@ export default {
           type: "warning",
         });
       }
-    },
-    async openFolder(item: IDownloadFile) {
+    };
+    const openFolder = async (item: IDownloadFile) => {
       const success = await openFileInFolder(item.path);
       if (!success) {
         // @ts-ignore
@@ -212,28 +177,48 @@ export default {
           type: "warning",
         });
       }
-    },
-    async removeDownloadItem(item: IDownloadFile, index: number) {
+    };
+    const removeDownloadItem = async (item: IDownloadFile, index: number) => {
       let _item = cloneDeep(item);
-      _item = await removeDownloadItem(_item, index);
-      const _index = this.dh.findIndex((d) => d.id === _item.id);
+      await removeDownloadItem(_item, index);
+      const _index = dh.value.findIndex((d) => d.id === _item.id);
       if (_index !== -1) {
-        this.dh.splice(_index, 1);
+        dh.value.splice(_index, 1);
       }
-      this.bytes = this.getDownloadBytes();
-    },
-    redoBtnClick(item: IDownloadFile) {
+      bytes.value = getDownloadBytes();
+    };
+
+    const redoBtnClick = (item: IDownloadFile) => {
       const _item = cloneDeep(item);
       if (item.state === "progressing" && item.paused) {
         pauseOrResume(_item);
       } else {
         retryDownloadFile(_item);
       }
-    },
-    formatPercentage(percentage: any): string {
+    };
+    const formatPercentage = (percentage: any): string => {
       return Number(percentage).toFixed(2) + "%";
-    },
-  },
+    };
+    // add listeners
+    listenerNewDownloadItem(handleUpdate);
+    listenerDownloadItemUpdate(handleUpdate);
+    listenerDownloadItemDone(handleUpdate);
+
+    return {
+      dh,
+      bytes,
+      getDownloadBytes,
+      byteUnited,
+      displayStatus,
+      getQuerySid,
+      pauseOrResumeDownload,
+      openFile,
+      openFolder,
+      removeDownloadItem,
+      redoBtnClick,
+      formatPercentage
+    };
+  }
 };
 </script>
 

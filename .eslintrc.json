@@ -6,9 +6,10 @@
     },
     "extends": [
         "eslint:recommended",
-        "plugin:vue/essential",
+        "plugin:vue/vue3-essential",
         "plugin:@typescript-eslint/recommended"
     ],
+    "parser": "vue-eslint-parser",
     "parserOptions": {
         "ecmaVersion": "latest",
         "parser": "@typescript-eslint/parser",
@@ -26,7 +27,8 @@
         "quotes": [
             "error",
             "double"
-        ]
+        ],
+        "@typescript-eslint/ban-ts-comment": 0
     },
     "ignorePatterns": ["./dist/**", "./script/**", "shims-vue.d.ts"]
 }

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /** docoment 加载完成 */
 function domReady(...args) {
   const condition = args.length ? [...args] : ["complete", "interactive"];

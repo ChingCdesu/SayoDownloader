@@ -1,4 +1,4 @@
-import { IBeatmapSet, IBeatmap } from "@src/common/interfaces/osu";
+import { IBeatmapSet } from "@src/common/interfaces/osu";
 import { IApiBeatmapSet } from "@src/common/interfaces/api.osu";
 
 export const apiData2IBeatmapSet = (data: IApiBeatmapSet): IBeatmapSet => {

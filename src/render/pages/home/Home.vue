@@ -122,7 +122,7 @@
   </div>
   <Player />
   <el-dialog
-    v-model="this.modalVisible"
+    v-model="modalVisible"
     width="75%"
     :modal="true"
     :show-close="false"
@@ -132,7 +132,7 @@
     :center="true"
     custom-class="song-detail-modal"
   >
-    <SongDetailModal :BeatmapSet="modalMap" />
+    <SongDetailModal :BeatmapSet="modalMap" :ActiveBid="modalBid"  v-if="modalMap" />
     <div
       class="modal-background"
       :style="{
@@ -158,10 +158,10 @@ import store from "@src/common/utils/store";
 import { OsuConstant } from "@src/common/constant";
 import { ElInfiniteScroll } from "element-plus";
 
-import { listenerLinkBeatmap } from '@src/render/hooks/protocol/ipc-renderer'
+import { listenerLinkBeatmap } from "@src/render/hooks/protocol/ipc-renderer";
 
 export default {
-  name: "home",
+  name: "HomePage",
   components: { SongCard, Player, SongDetailModal },
   directives: { "infinite-scroll": ElInfiniteScroll },
   setup() {
@@ -172,6 +172,7 @@ export default {
     let no_more = ref(false);
     let modalVisible = ref(false);
     let modalMap: Ref<IBeatmapSet | undefined> = ref(undefined);
+    let modalBid: Ref<number | undefined> = ref(undefined);
 
     let keyword = ref("");
     if (store.has("searchKeyword")) {
@@ -195,6 +196,8 @@ export default {
     }
     const limit = ref(20);
     let page = ref(0);
+    const filterBtnClass = "filter-checkbox-btn";
+
     const isFilterArrayEmpty = (arr: any[] | undefined): boolean => {
       return arr?.length === 0;
     };
@@ -238,6 +241,38 @@ export default {
       store.set("searchKeyword", keyword.value);
       store.set("searchFilter", filter);
     };
+
+    const showDetail = (sid: number, bid: number | undefined = undefined) => {
+      modalMap.value = [...sets.value, ...linksets.value].find(v => v.id === sid);
+      if (bid) modalBid.value = bid;
+      if (modalMap.value) {
+        modalVisible.value = true;
+      }
+    };
+
+    const handleLinkBeatmap = async (_: any, url: string) => {
+      const uri = new URL(url);
+      const [type] = uri.pathname.substr(1).split("/");
+      switch (type) {
+        case "beatmapsets": {
+          const [_1, sid] = uri.pathname.substr(1).split("/");
+          const [_2, bid] = uri.hash.split("/");
+          if (!sid) break;
+          const info = await Api.get(`/v2/beatmapinfo?K=${sid}`);
+          if (!info || info.status !== 200) {
+            error.value = true;
+            return;
+          }
+          const beatmapset = info.data.data as IApiBeatmapSet;
+          linksets.value.push(apiData2IBeatmapSet(beatmapset));
+          showDetail(Number(sid), bid ? Number(bid) : undefined);
+          break;
+        }
+        default:
+          break;
+      }
+    };
+
     const combineFilterObj = (): IBeatmapListParams => {
       let obj: IBeatmapListParams = {
         cmd: "beatmaplist",
@@ -276,6 +311,7 @@ export default {
       if (!isFilterArray2Empty(filter.length)) obj.length = filter.length;
       return obj;
     };
+
     const loadMore = async () => {
       if (no_more.value) return;
       page.value++;
@@ -300,6 +336,7 @@ export default {
         // console.log('no more')
       }
     };
+
     onMounted(async () => {
       await onSearch();
       autoload.value = true;
@@ -312,46 +349,31 @@ export default {
       }
     );
 
-    const showDetail = (sid: number) => {
-      modalMap.value = [...sets.value, ...linksets.value].find(v => v.id === sid)
-      modalVisible.value = true
-    }
+    listenerLinkBeatmap(handleLinkBeatmap);
 
-    const handleLinkBeatmap = async (_: any, url: string) => {
-      const uri = new URL(url)
-      const [type] = uri.pathname.substr(1).split('/')
-      switch (type) {
-        case 'beatmapsets': {
-          const [_, sid] = uri.pathname.substr(1).split('/')
-          const info = await Api.get(`/v2/beatmapinfo?K=${sid}`);
-          if (!info || info.status !== 200) {
-            error.value = true;
-            return;
-          }
-          const beatmapset = info.data.data as IApiBeatmapSet;
-          linksets.value.push(apiData2IBeatmapSet(beatmapset));
-          showDetail(Number(sid))
-          break;
-        }
-        default:
-          break
-      }
-    }
-
-    listenerLinkBeatmap(handleLinkBeatmap)
-
-    return { sets, error, filter, onSearch, loadMore, keyword, autoload, no_more, modalMap, modalVisible, showDetail };
-  },
-  data() {
-    const filterBtnClass = "filter-checkbox-btn";
     return {
+      // data
+      sets,
+      error,
+      filter,
+      keyword,
+      autoload,
+      no_more,
+      modalMap,
+      modalVisible,
+      modalBid,
+      // methods
+      showDetail,
+      onSearch,
+      loadMore,
+      // constants
       filterBtnClass,
       modeOptions: OsuConstant.mode,
       approvedOptions: OsuConstant.approved,
       genreOptions: OsuConstant.genre,
       languageOptions: OsuConstant.language,
     };
-  },
+  }
 };
 </script>
 

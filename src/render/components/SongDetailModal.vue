@@ -37,7 +37,7 @@
       </template>
     </el-tab-pane>
   </el-tabs>
-  <div class="map-version-text">{{ activeMap.name }}</div>
+  <div class="map-version-text">{{ activeMap?.name }}</div>
   <div class="display-title">{{ displayTitle }}</div>
   <div class="display-artist">{{ displayArtist }}</div>
   <div>作图者：{{ BeatmapSet.creator }}</div>
@@ -77,16 +77,20 @@
         </el-space>
         <el-space :size="4">
           <div class="circle-count-icon info-icon" />
-          <span>{{ activeMap.circle_count }}</span>
+          <span>{{ activeMap?.circle_count ?? 0 }}</span>
         </el-space>
         <el-space :size="4">
           <div class="slider-count-icon info-icon" />
-          <span>{{ activeMap.slider_count }}</span>
+          <span>{{ activeMap?.slider_count ?? 0 }}</span>
         </el-space>
       </el-space>
       <div class="info-part2">
         <el-space direction="vertical" :size="4">
-          <div class="map-info-with-bar" v-for="(value, name) in activeMap.map_diff" :key="name">
+          <div
+            class="map-info-with-bar"
+            v-for="(value, name) in (activeMap?.map_diff ?? {})"
+            :key="name"
+          >
             <div class="map-info-with-bar__title">{{ getNameOfDiff(name) }}</div>
             <el-progress :percentage="value * 10" :show-text="false" :color="colors" />
             <div class="map-info-with-bar__number">{{ value }}</div>
@@ -94,11 +98,11 @@
           <div class="map-info-with-bar">
             <div class="map-info-with-bar__title">难度星级</div>
             <el-progress
-              :percentage="activeMap.difficult * 10"
+              :percentage="(activeMap?.difficult ?? 0) * 10"
               :show-text="false"
-              :color="diffColor(activeMap.difficult)"
+              :color="diffColor(activeMap?.difficult ?? 0)"
             />
-            <div class="map-info-with-bar__number">{{ activeMap.difficult.toFixed(2) }}</div>
+            <div class="map-info-with-bar__number">{{ activeMap?.difficult.toFixed(2) ?? "0.00" }}</div>
           </div>
         </el-space>
       </div>
@@ -115,7 +119,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, ref } from "vue";
+import { PropType, ref, computed } from "vue";
 import { IBeatmap, IBeatmapSet } from "@src/common/interfaces/osu";
 import store from "@src/common/utils/store";
 import { Approved, GameMode } from "@src/common/enums/osu";
@@ -131,7 +135,7 @@ import {
 
 import { OsuConstant } from "@src/common/constant";
 
-import { Download, Plus } from '@element-plus/icons'
+import { Download, Plus } from "@element-plus/icons";
 
 export default {
   name: "SongDetailModal",
@@ -140,54 +144,64 @@ export default {
       type: Object as PropType<IBeatmapSet>,
       required: true,
     },
+    ActiveBid: {
+      type: Number,
+      default: -1
+    }
   },
-  setup(props) {
+  setup(props: { BeatmapSet: IBeatmapSet; ActiveBid: number; }) {
     const color = diffColor(props.BeatmapSet.maps[0].difficult as number);
     document.body.style.setProperty("--song-detail-modal__active-color", color);
-    const activeMap = ref(props.BeatmapSet.maps[0])
+    const activeMap = ref(props.BeatmapSet.maps.find((m) => m.id === props.ActiveBid) ?? props.BeatmapSet.maps[0]);
+    const activeBid = ref(props.ActiveBid !== -1 ? String(props.ActiveBid) : props.BeatmapSet.maps[0].id.toString());
 
-    return {
-      BeatmapSet: props.BeatmapSet,
-      gameModeString,
-      getModeIconClass,
-      diffColor,
-      activeBid: props.BeatmapSet.maps[0].id.toString(),
-      activeMap,
-      Download,
-      Plus
-    };
-  },
-  data() {
-    return {
-      colors: [
-        { percentage: 0, color: "#4fbdfc" },
-        { percentage: 20, color: "#65ff84" },
-        { percentage: 40, color: "#adf94e" },
-        { percentage: 60, color: "#f9a55f" },
-        { percentage: 80, color: "#f9514e" },
-        { percentage: 100, color: "#a067ff" },
-      ],
-      languages: OsuConstant.LanguageChinese,
-      genres: OsuConstant.GenreChinese,
-    };
-  },
-  methods: {
-    addSong() {
+    const approvedClass = computed((): string => {
+      return Approved[props.BeatmapSet.approved] + " approved-status";
+    });
+
+    const approved = computed((): string => {
+      return Approved[props.BeatmapSet.approved].toUpperCase();
+    });
+    const modes = computed((): Set<GameMode> => {
+      let _modes: Set<GameMode> = new Set();
+      props.BeatmapSet.maps.forEach((v) => {
+        const _mode = v.mode;
+        _modes.add(_mode);
+      });
+      return _modes;
+    });
+    const displayTitle = computed((): string => {
+      const uni = store.get("displayWithUnicode");
+      let ret: string | undefined;
+      if (uni) ret = props.BeatmapSet.titleU || props.BeatmapSet.title;
+      else ret = props.BeatmapSet.title;
+      return ret || "";
+    });
+    const displayArtist = computed((): string => {
+      const uni = store.get("displayWithUnicode");
+      let ret: string | undefined;
+      if (uni) ret = props.BeatmapSet.artistU || props.BeatmapSet.artist;
+      else ret = props.BeatmapSet.artist;
+      return ret || "";
+    });
+
+
+    const addSong = () => {
       const player = PlayerSingleton.instance;
-      if (this.BeatmapSet.audio) {
-        const url = `https://dl.sayobot.cn/beatmaps/files/${this.BeatmapSet.id}/${this.BeatmapSet.audio}`;
-        const title = `${this.displayTitle.toString()} - ${this.displayArtist.toString()}`;
+      if (props.BeatmapSet.audio) {
+        const url = `https://dl.sayobot.cn/beatmaps/files/${props.BeatmapSet.id}/${props.BeatmapSet.audio}`;
+        const title = `${displayTitle.value.toString()} - ${displayArtist.value.toString()}`;
         const id = player.addAudioToPlaylist(
           url,
           title,
-          this.BeatmapSet.id as number
+          props.BeatmapSet.id as number
         );
       }
-    },
-    async download() {
-      const url = `https://dl.sayobot.cn/beatmaps/download/${store.get('oszVersion')}/${this.BeatmapSet.id}`;
-      const fileName = `${this.BeatmapSet.id} ${this.BeatmapSet.title} - ${this.BeatmapSet.artist}.osz`;
-      const path = store.get('defaultDownloadPath');
+    };
+    const download = async () => {
+      const url = `https://dl.sayobot.cn/beatmaps/download/${store.get("oszVersion")}/${props.BeatmapSet.id}`;
+      const fileName = `${props.BeatmapSet.id} ${props.BeatmapSet.title} - ${props.BeatmapSet.artist}.osz`;
+      const path = store.get("defaultDownloadPath");
       newDownloadFile({
         url,
         fileName,
@@ -218,65 +232,70 @@ export default {
             type: "error",
           });
         });
-    },
-    mapFilter(mode: GameMode): IBeatmap[] {
-      return this.BeatmapSet.maps.filter(v => v.mode == mode);
-    },
-    activeChanged(tab: any) {
+    };
+    const mapFilter = (mode: GameMode): IBeatmap[] => {
+      return props.BeatmapSet.maps.filter((v: { mode: GameMode; }) => v.mode == mode);
+    };
+    const activeChanged = (tab: any) => {
       const bid = Number(tab.props.name);
-      this.activeMap = this.BeatmapSet.maps.find(m => m.id === bid);
-      const color = this.diffColor(this.activeMap.difficult as number);
+      activeMap.value = props.BeatmapSet.maps.find((m: { id: number; }) => m.id === bid) ?? props.BeatmapSet.maps[0];
+      const color = diffColor(activeMap.value?.difficult as number);
       document.body.style.setProperty(
         "--song-detail-modal__active-color",
         color
       );
-    },
-    secondToTime(sec: number): string {
+    };
+    const secondToTime = (sec: number): string => {
       const _sec = Math.floor(sec % 60);
       const _min = Math.floor(sec / 60);
       return `${_min.toString()}:${_sec.toString().padStart(2, "0")}`;
-    },
-    getNameOfDiff(index: string) {
+    };
+    const getNameOfDiff = (index: "cs" | "ar" | "hp" | "od") => {
       const names = {
         cs: "圆圈大小",
         ar: "缩圈速度",
         hp: "掉血速度",
         od: "准确率",
       };
-      // @ts-ignore
       return names[index];
-    },
-  },
-  computed: {
-    approvedClass(): string {
-      return Approved[this.BeatmapSet.approved] + " approved-status";
-    },
-    approved(): string {
-      return Approved[this.BeatmapSet.approved].toUpperCase();
-    },
-    modes(): Set<GameMode> {
-      let _modes: Set<GameMode> = new Set();
-      this.BeatmapSet.maps.forEach((v) => {
-        const _mode = v.mode;
-        _modes.add(_mode);
-      });
-      return _modes;
-    },
-    displayTitle(): String {
-      const uni = store.get("displayWithUnicode");
-      let ret: String | undefined;
-      if (uni) ret = this.BeatmapSet?.titleU || this.BeatmapSet?.title;
-      else ret = this.BeatmapSet?.title;
-      return ret || "";
-    },
-    displayArtist(): String {
-      const uni = store.get("displayWithUnicode");
-      let ret: String | undefined;
-      if (uni) ret = this.BeatmapSet?.artistU || this.BeatmapSet?.artist;
-      else ret = this.BeatmapSet?.artist;
-      return ret || "";
-    },
-  },
+    };
+
+    return {
+      // data
+      activeBid,
+      activeMap,
+      // methods
+      gameModeString,
+      getModeIconClass,
+      diffColor,
+      addSong,
+      download,
+      mapFilter,
+      activeChanged,
+      secondToTime,
+      getNameOfDiff,
+      // constants
+      colors: [
+        { percentage: 0, color: "#4fbdfc" },
+        { percentage: 20, color: "#65ff84" },
+        { percentage: 40, color: "#adf94e" },
+        { percentage: 60, color: "#f9a55f" },
+        { percentage: 80, color: "#f9514e" },
+        { percentage: 100, color: "#a067ff" },
+      ],
+      languages: OsuConstant.LanguageChinese,
+      genres: OsuConstant.GenreChinese,
+      // computed
+      approvedClass,
+      approved,
+      modes,
+      displayTitle,
+      displayArtist,
+      // components
+      Download,
+      Plus
+    };
+  }
 };
 </script>
 

@@ -1,84 +1,63 @@
 <template>
-  <div class="audio-player" v-if="this.player.playlist.length !== 0">
+  <div class="audio-player" v-if="player.playlist.length !== 0">
     <div class="controls">
-      <font-awesome-icon
-        class="control-btn"
-        :icon="['fas', 'backward']"
-        @click="this.previousSong"
-      ></font-awesome-icon>
+      <font-awesome-icon class="control-btn" :icon="['fas', 'backward']" @click="previousSong"></font-awesome-icon>
       <font-awesome-icon
         class="control-btn"
         :icon="['fas', 'play']"
-        v-if="!this.player.playing && !this.player.loading"
-        @click="this.resume"
+        v-if="!player.playing && !player.loading"
+        @click="resume"
       ></font-awesome-icon>
       <font-awesome-icon
         class="control-btn"
         :icon="['fas', 'pause']"
-        v-if="this.player.playing && !this.player.loading"
-        @click="this.pause"
+        v-if="player.playing && !player.loading"
+        @click="pause"
       ></font-awesome-icon>
       <font-awesome-icon
         class="control-btn"
         :style="{ 'cursor': 'default' }"
         :icon="['fas', 'spinner']"
         spin
-        v-if="this.player.loading"
+        v-if="player.loading"
       ></font-awesome-icon>
-      <font-awesome-icon
-        class="control-btn"
-        :icon="['fas', 'stop']"
-        @click="this.stop"
-      ></font-awesome-icon>
-      <font-awesome-icon
-        class="control-btn"
-        :icon="['fas', 'forward']"
-        @click="this.nextSong"
-      ></font-awesome-icon>
+      <font-awesome-icon class="control-btn" :icon="['fas', 'stop']" @click="stop"></font-awesome-icon>
+      <font-awesome-icon class="control-btn" :icon="['fas', 'forward']" @click="nextSong"></font-awesome-icon>
     </div>
     <div class="duration">
-      <div class="timer-text time">
-        {{ this.secondToTime(this.item.timer) }}
-      </div>
+      <div class="timer-text time">{{ secondToTime(item.timer ?? 0) }}</div>
       <el-slider
         class="duration-bar"
-        :format-tooltip="this.secondToTime"
-        v-model="this.item.timer"
-        :max="this.item.duration || 0"
-        :disabled="this.item.duration === 0"
-        @change="this.seek"
+        :format-tooltip="secondToTime"
+        v-model="item.timer"
+        :max="item.duration || 0"
+        :disabled="item.duration === 0"
+        @change="seek"
       />
-      <div class="duration-text time">
-        {{ this.secondToTime(this.item.duration) }}
-      </div>
+      <div class="duration-text time">{{ secondToTime(item.duration ?? 0) }}</div>
     </div>
     <div class="volume">
       <div class="volume-icon">
         <font-awesome-icon
           class="control-btn"
           :icon="['fas', 'volume-up']"
-          v-if="this.volume >= 50"
-          @click="this.doMute"
+          v-if="volume >= 50"
+          @click="doMute"
         />
         <font-awesome-icon
           class="control-btn"
           :icon="['fas', 'volume-down']"
-          v-if="this.volume < 50 && this.volume > 0"
-          @click="this.doMute"
+          v-if="volume < 50 && volume > 0"
+          @click="doMute"
         />
         <font-awesome-icon
           class="control-btn"
           :icon="['fas', 'volume-mute']"
-          v-if="this.volume === 0"
-          @click="this.unmute"
+          v-if="volume === 0"
+          @click="unmute"
         />
       </div>
-      <el-slider
-        class="volume-bar"
-        v-model="this.volume"
-        :max="100"
-        @input="this.changeVolume"
-      />
+      <el-slider class="volume-bar" v-model="volume" :max="100" @input="changeVolume" />
     </div>
     <div class="playlist">
       <el-popover
@@ -94,8 +73,8 @@
         <div class="playlist-popover__inner">
           <div
             class="playlist-popover__content"
-            :class="this.item.id === listitem.id ? 'isplaying' : ''"
-            v-for="listitem in this.player.playlist"
+            :class="item.id === listitem.id ? 'isplaying' : ''"
+            v-for="listitem in player.playlist"
             :key="listitem.id"
           >
             <div>
@@ -103,14 +82,14 @@
                 class="fa-remove-icon"
                 color="rgb(242, 83, 91)"
                 :icon="['fas', 'times']"
-                @click="this.removeSong(listitem.id)"
+                @click="removeSong(listitem.id)"
               />
-              <span @click="this.play(listitem.id)">{{ listitem.title }}</span>
+              <span @click="play(listitem.id)">{{ listitem.title }}</span>
             </div>
             <font-awesome-icon
               class="fa-play-icon"
               :icon="['fas', 'play']"
-              @click="this.play(listitem.id)"
+              @click="play(listitem.id)"
             />
           </div>
         </div>
@@ -122,11 +101,12 @@
 <script lang="ts">
 import PlayerSingleton from "@src/common/utils/player";
 import { PlayListItem } from "@src/common/interfaces/player";
+import { ref, Ref } from "vue";
 
 export default {
-  name: "player",
-  data() {
-    let item: PlayListItem = {
+  name: "PlayerComponent",
+  setup() {
+    const item: Ref<PlayListItem> = ref({
       id: "",
       sid: 0,
       url: "",
@@ -134,68 +114,82 @@ export default {
       timer: 0,
       duration: 0,
       deleted: false,
-    };
+    });
     const player = PlayerSingleton.instance;
-    let volume = player.getVolume();
-    let storedVolume = volume;
+    const volume = ref(player.getVolume());
+    const storedVolume = ref(player.getVolume());
+
     player.walkSync = (it: PlayListItem) => {
-      // @ts-ignore: 这里必须为this.item，函数触发的时候已经渲染完了
-      this.item = it;
+      item.value = it;
     };
-    return {
-      player,
-      item,
-      volume,
-      storedVolume,
+
+    const play = (id: string) => {
+      player.play(id);
     };
-  },
-  computed: {},
-  methods: {
-    play(id: string) {
-      this.player.play(id);
-    },
-    removeSong(id: string) {
-      this.player.removePlaylistItem(id);
-    },
-    resume() {
-      this.player.resume();
-    },
-    pause() {
-      this.player.pause();
-    },
-    stop() {
-      this.player.stop();
-    },
-    seek(time: number) {
-      this.player.seek(time);
-    },
-    previousSong() {
-      this.player.previousSong();
-    },
-    nextSong() {
-      this.player.nextSong();
-    },
-    changeVolume(volume: number) {
-      if (volume !== 0) this.storedVolume = volume;
-      this.player.setVolume(volume);
-    },
-    secondToTime(sec: number): string {
+
+    const removeSong = (id: string) => {
+      player.removePlaylistItem(id);
+    };
+    const resume = () => {
+      player.resume();
+    };
+    const pause = () => {
+      player.pause();
+    };
+    const stop = () => {
+      player.stop();
+    };
+    const seek = (time: number) => {
+      player.seek(time);
+    };
+    const previousSong = () => {
+      player.previousSong();
+    };
+    const nextSong = () => {
+      player.nextSong();
+    };
+    const changeVolume = (volume: number) => {
+      if (volume !== 0) storedVolume.value = volume;
+      player.setVolume(volume);
+    };
+    const secondToTime = (sec: number): string => {
       const _sec = Math.floor(sec % 60);
       const _min = Math.floor(sec / 60);
       return `${_min.toString().padStart(2, "0")}:${_sec
         .toString()
         .padStart(2, "0")}`;
-    },
-    doMute() {
-      this.storedVolume = this.volume;
-      this.volume = 0;
+    };
+    const doMute = () => {
+      storedVolume.value = volume.value;
+      volume.value = 0;
       // this.player.setVolume(0);
-    },
-    unmute() {
-      this.volume = this.storedVolume;
+    };
+    const unmute = () => {
+      volume.value = storedVolume.value;
       // this.player.setVolume(this.volume);
-    },
-  },
+    };
+
+    return {
+      // data
+      player,
+      item,
+      volume,
+      storedVolume,
+      // methods
+      play,
+      removeSong,
+      resume,
+      pause,
+      stop,
+      seek,
+      previousSong,
+      nextSong,
+      changeVolume,
+      secondToTime,
+      doMute,
+      unmute
+    };
+  }
 };
 </script>
 

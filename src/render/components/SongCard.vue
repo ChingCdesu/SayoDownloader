@@ -8,10 +8,7 @@
 				/>
 			</div>
 			<div class="right-cover">
-				<img
-					class="img-cover"
-					:src="`https://assets.ppy.sh/beatmaps/${BeatmapSet.id}/covers/card.jpg`"
-				/>
+				<img class="img-cover" :src="`https://assets.ppy.sh/beatmaps/${BeatmapSet.id}/covers/card.jpg`" />
 			</div>
 		</div>
 		<div class="content">
@@ -32,11 +29,7 @@
 						<el-space v-for="mode in modes" :key="mode" :size="3">
 							<el-space v-if="mapFilter(mode).length !== 0" align="center" :size="diffspace">
 								<i class="icon-osu diffs-mode-icon" :class="getModeIconClass(mode)" />
-								<el-space
-									v-if="mapFilter(mode).length < 15"
-									class="diffs__inner"
-									:size="diffspace"
-								>
+								<el-space v-if="mapFilter(mode).length < 15" class="diffs__inner" :size="diffspace">
 									<div
 										class="diff"
 										v-for="beatmap in mapFilter(mode)"
@@ -44,10 +37,7 @@
 										:style="{ background: diffColor(beatmap.difficult) }"
 									></div>
 								</el-space>
-								<span
-									v-if="mapFilter(mode).length >= 15"
-									class="diff-count"
-								>{{ mapFilter(mode).length }}</span>
+								<span v-if="mapFilter(mode).length >= 15" class="diff-count">{{ mapFilter(mode).length }}</span>
 							</el-space>
 						</el-space>
 					</div>
@@ -98,7 +88,9 @@
 
 <script lang="ts">
 import {
-	PropType
+	PropType,
+	ref,
+	computed
 } from "vue";
 import {
 	IBeatmapSet
@@ -129,46 +121,69 @@ export default {
 			required: true,
 		},
 	},
-	setup(props) {
-		return {
-			BeatmapSet: props.BeatmapSet,
-			gameModeString,
-			getModeIconClass,
-			diffColor,
-		};
-	},
-	data() {
+	setup(props: { BeatmapSet: IBeatmapSet; }) {
 		const player = PlayerSingleton.instance;
-		return {
-			diffspace: 1,
-			mouseInDetailDiv: false,
-			mouseInDiffsDiv: false,
-			player,
-			downloadTooltip: "下载",
-			songDetailModalActiveMode: null,
-			songDetailModalActiveDiffIndex: 0,
+		const diffspace = ref(1);
+		const mouseInDetailDiv = ref(false);
+		const mouseInDiffsDiv = ref(false);
+		const downloadTooltip = ref("下载");
+		const songDetailModalActiveMode = ref(null);
+		const songDetailModalActiveDiffIndex = ref(0);
+
+		const approvedClass = computed((): string => {
+      return Approved[props.BeatmapSet.approved] + " approved-status";
+    });
+
+    const approved = computed((): string => {
+      return Approved[props.BeatmapSet.approved].toUpperCase();
+    });
+    const modes = computed((): Set<GameMode> => {
+      let _modes: Set<GameMode> = new Set();
+      props.BeatmapSet.maps.forEach((v) => {
+        const _mode = v.mode;
+        _modes.add(_mode);
+      });
+      return _modes;
+    });
+    const displayTitle = computed((): string => {
+      const uni = store.get("displayWithUnicode");
+      let ret: string | undefined;
+      if (uni) ret = props.BeatmapSet?.titleU || props.BeatmapSet?.title;
+      else ret = props.BeatmapSet?.title;
+      return ret || "";
+    });
+    const displayArtist = computed((): string => {
+      const uni = store.get("displayWithUnicode");
+      let ret: string | undefined;
+      if (uni) ret = props.BeatmapSet?.artistU || props.BeatmapSet?.artist;
+      else ret = props.BeatmapSet?.artist;
+      return ret || "";
+    });
+
+		const detailShow = computed((): boolean => {
+			return mouseInDetailDiv.value || mouseInDiffsDiv.value;
+		});
+
+		const mapFilter = (mode: GameMode): IBeatmap[] => {
+			return props.BeatmapSet.maps.filter((v) => v.mode == mode);
 		};
-	},
-	methods: {
-		mapFilter(mode: GameMode): IBeatmap[] {
-			return this.BeatmapSet.maps.filter((v) => v.mode == mode);
-		},
-		addSongAndPlay() {
-			if (this.BeatmapSet.audio) {
-				const url = `https://dl.sayobot.cn/beatmaps/files/${this.BeatmapSet.id}/${this.BeatmapSet.audio}`;
-				const title = `${this.displayTitle.toString()} - ${this.displayArtist.toString()}`;
-				const id = this.player.addAudioToPlaylist(
+
+		const addSongAndPlay = () => {
+			if (props.BeatmapSet.audio) {
+				const url = `https://dl.sayobot.cn/beatmaps/files/${props.BeatmapSet.id}/${props.BeatmapSet.audio}`;
+				const title = `${displayTitle.value.toString()} - ${displayArtist.value.toString()}`;
+				const id = player.addAudioToPlaylist(
 					url,
 					title,
-					this.BeatmapSet.id as number
+					props.BeatmapSet.id as number
 				);
-				this.player.play(id);
+				player.play(id);
 			}
-		},
-		async download() {
-			const url = `https://dl.sayobot.cn/beatmaps/download/${store.get('oszVersion')}/${this.BeatmapSet.id}`;
-			const fileName = `${this.BeatmapSet.id} ${this.BeatmapSet.title} - ${this.BeatmapSet.artist}.osz`;
-			const path = store.get('defaultDownloadPath');
+		};
+		const download =  async () => {
+			const url = `https://dl.sayobot.cn/beatmaps/download/${store.get("oszVersion")}/${props.BeatmapSet.id}`;
+			const fileName = `${props.BeatmapSet.id} ${props.BeatmapSet.title} - ${props.BeatmapSet.artist}.osz`;
+			const path = store.get("defaultDownloadPath");
 			newDownloadFile({
 				url,
 				fileName,
@@ -176,9 +191,9 @@ export default {
 			})
 				.then((data) => {
 					if (!data) {
-						this.downloadTooltip = "已加入下载队列";
+						downloadTooltip.value = "已加入下载队列";
 						setTimeout(() => {
-							this.downloadTooltip = "下载";
+							downloadTooltip.value = "下载";
 						}, 4500);
 						// @ts-ignore
 						this.$notify({
@@ -203,40 +218,32 @@ export default {
 						type: "error",
 					});
 				});
-		},
-	},
-	computed: {
-		approvedClass(): string {
-			return Approved[this.BeatmapSet.approved] + " approved-status";
-		},
-		approved(): string {
-			return Approved[this.BeatmapSet.approved].toUpperCase();
-		},
-		modes(): Set<GameMode> {
-			let _modes: Set<GameMode> = new Set();
-			this.BeatmapSet.maps.forEach((v) => {
-				const _mode = v.mode;
-				_modes.add(_mode);
-			});
-			return _modes;
-		},
-		detailShow(): boolean {
-			return this.mouseInDetailDiv || this.mouseInDiffsDiv;
-		},
-		displayTitle(): String {
-			const uni = store.get("displayWithUnicode");
-			let ret: String | undefined;
-			if (uni) ret = this.BeatmapSet?.titleU || this.BeatmapSet?.title;
-			else ret = this.BeatmapSet?.title;
-			return ret || "";
-		},
-		displayArtist(): String {
-			const uni = store.get("displayWithUnicode");
-			let ret: String | undefined;
-			if (uni) ret = this.BeatmapSet?.artistU || this.BeatmapSet?.artist;
-			else ret = this.BeatmapSet?.artist;
-			return ret || "";
-		},
+		};
+
+		return {
+			// methods
+			gameModeString,
+			getModeIconClass,
+			diffColor,
+			mapFilter,
+			addSongAndPlay,
+			download,
+			// data
+			player,
+			diffspace,
+			mouseInDetailDiv,
+			mouseInDiffsDiv,
+			downloadTooltip,
+			songDetailModalActiveMode,
+			songDetailModalActiveDiffIndex,
+			// computed
+			approved,
+			approvedClass,
+			modes,
+			displayArtist,
+			displayTitle,
+			detailShow
+		};
 	},
 };
 </script>

@@ -21,36 +21,25 @@
             v-model="oszVersion"
             label="full"
             @change="changeOszVersion"
-            >全部</el-radio
-          >
+          >全部</el-radio>
           <el-radio
             class="radio-osz-version"
             v-model="oszVersion"
             label="novideo"
             @change="changeOszVersion"
-            >不带视频</el-radio
-          >
+          >不带视频</el-radio>
           <el-radio
             class="radio-osz-version"
             v-model="oszVersion"
             label="mini"
             @change="changeOszVersion"
-            >mini</el-radio
-          >
+          >mini</el-radio>
         </div>
-        <div class="tips tips-normal">
-          "全部"版本包含视频和Storyboard（如果有）
-        </div>
-        <div class="tips tips-normal">
-          "mini"版本不包含视频和Storyboard，但是包括背景图片
-        </div>
+        <div class="tips tips-normal">"全部"版本包含视频和Storyboard（如果有）</div>
+        <div class="tips tips-normal">"mini"版本不包含视频和Storyboard，但是包括背景图片</div>
       </el-form-item>
       <el-form-item :label="'下载完成后打开文件'">
-        <el-switch
-          active-color="#13ce66"
-          v-model="openDownloaded"
-          @change="changeOpenDownloaded"
-        ></el-switch>
+        <el-switch active-color="#13ce66" v-model="openDownloaded" @change="changeOpenDownloaded"></el-switch>
       </el-form-item>
       <el-form-item :label="'以源语言显示歌曲名和歌手名'">
         <el-switch
@@ -66,52 +55,70 @@
 <script lang="ts">
 import store from "@src/common/utils/store";
 import { OszVersion } from "@src/common/interfaces/app";
-import { showOpenDialog, checkPathExists } from "@/hooks/app/ipc-renderer";
+import { showOpenDialog, checkPathExists as _checkPathExists } from "@/hooks/app/ipc-renderer";
+import { ref } from "vue";
 
 export default {
-  name: "settings",
-  data() {
-    return {
-      downloadPath: store.get("defaultDownloadPath"),
-      displayWithUnicode: store.get("displayWithUnicode"),
-      openDownloaded: store.get("openDownloaded"),
-      oszVersion: store.get("oszVersion"),
-      pathErrorMsg: "",
+  name: "SettingsPage",
+  setup() {
+    const downloadPath = ref(store.get("defaultDownloadPath"));
+    const displayWithUnicode = ref(store.get("displayWithUnicode"));
+    const openDownloaded = ref(store.get("openDownloaded"));
+    const oszVersion = ref(store.get("oszVersion"));
+    const pathErrorMsg = ref("");
+
+    const checkPathExists = async (path: string) => {
+      downloadPath.value = path;
+      const exist = await _checkPathExists(path);
+      if (!exist) pathErrorMsg.value = "找不到该路径";
+      else pathErrorMsg.value = "";
     };
-  },
-  methods: {
-    async checkPathExists(path: string) {
-      this.downloadPath = path;
-      const exist = await checkPathExists(path);
-      if (!exist) this.pathErrorMsg = "找不到该路径";
-      else this.pathErrorMsg = "";
-    },
-    changeDownloadPath(path: string) {
-      if (this.pathErrorMsg !== "") return;
+
+    const changeDownloadPath = (path: string) => {
+      if (pathErrorMsg.value !== "") return;
       store.set("defaultDownloadPath", path);
-    },
-    changeDisplayWithUnicode(value: boolean) {
+    };
+
+    const changeDisplayWithUnicode = (value: boolean) => {
       store.set("displayWithUnicode", value);
-      console.log(store.store)
-    },
-    changeOpenDownloaded(value: boolean) {
+      console.log(store.store);
+    };
+
+    const changeOpenDownloaded = (value: boolean) => {
       store.set("openDownloaded", value);
-    },
-    changeOszVersion(version: OszVersion) {
+    };
+    const changeOszVersion = (version: OszVersion) => {
       store.set("oszVersion", version);
-    },
-    async defaultPathDialog() {
+    };
+    const defaultPathDialog = async () => {
       const result = await showOpenDialog({
         title: "选择默认下载路径",
         properties: ["openDirectory"],
-        defaultPath: this.downloadPath,
+        defaultPath: downloadPath.value,
       });
       if (result && result?.length > 0) {
         const dir = result[0];
-        this.downloadPath = dir;
+        downloadPath.value = dir;
       }
-    },
-  },
+    };
+
+    return {
+      // data
+      downloadPath,
+      displayWithUnicode,
+      openDownloaded,
+      oszVersion,
+      pathErrorMsg,
+
+      // methods
+      checkPathExists,
+      changeDownloadPath,
+      changeOpenDownloaded,
+      changeOszVersion,
+      defaultPathDialog,
+      changeDisplayWithUnicode
+    };
+  }
 };
 </script>
 
