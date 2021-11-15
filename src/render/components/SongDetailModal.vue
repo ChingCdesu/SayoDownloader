@@ -150,10 +150,11 @@ export default {
     }
   },
   setup(props: { BeatmapSet: IBeatmapSet; ActiveBid: number; }) {
-    const color = diffColor(props.BeatmapSet.maps[0].difficult as number);
-    document.body.style.setProperty("--song-detail-modal__active-color", color);
     const activeMap = ref(props.BeatmapSet.maps.find((m) => m.id === props.ActiveBid) ?? props.BeatmapSet.maps[0]);
     const activeBid = ref(props.ActiveBid !== -1 ? String(props.ActiveBid) : props.BeatmapSet.maps[0].id.toString());
+
+    const color = diffColor(activeMap.value.difficult as number);
+    document.body.style.setProperty("--song-detail-modal__active-color", color);
 
     const approvedClass = computed((): string => {
       return Approved[props.BeatmapSet.approved] + " approved-status";
